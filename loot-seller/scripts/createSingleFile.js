@@ -10,7 +10,7 @@ const { glob } = require('glob');
 // Configuration
 const BUILD_DIR = path.join(__dirname, '../build');
 const IMAGES_DIR = path.join(__dirname, '../public/images/items');
-const OUTPUT_FILE = path.join(__dirname, '../dist/Dura Profit Calculator by Godlike.html');
+const OUTPUT_FILE = path.join(__dirname, '../dist/index.html');
 
 // Convert image to base64
 async function imageToBase64(imagePath) {
