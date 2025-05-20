@@ -507,7 +507,7 @@ function App() {
                             <div className="item-content">
                               <div className="item-name">{item.name}</div>
                               <div className="item-details">
-                                <span className="gold-text">{getDisplayValue(item.value)} gp</span>
+                                <span className="gold-text">{item.category === "New Custom" ? '?' : getDisplayValue(item.value)} gp</span>
                                 <span className={`npc-indicator ${item.category === "New Custom" ? 'new-custom' : ''}`}>
                                   {item.npcNames.length > 1
                                     ? ` ${item.npcNames.length} NPCs`
