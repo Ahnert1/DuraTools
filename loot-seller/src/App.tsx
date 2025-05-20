@@ -1,33 +1,15 @@
-import React, { useState, useRef, useEffect, useMemo } from 'react';
+import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import Fuse from 'fuse.js';
-import { ItemData, lootItems } from './data/itemDataMultiNpc';
+import { lootItems } from './data/itemDataMultiNpc';
+import { ExtendedItemData } from './models/ExtendedItemData';
 import { handleImageError } from './utils/imageUtils';
 import { CATEGORIES } from './enums/Categories';
 import { HeaderCollage } from './components/HeaderCollage';
 import { MiniHeaderCollage } from './components/MiniHeaderCollage';
-
-// Define the extended ItemData interface with additional fields we'll use
-interface ExtendedItemData extends ItemData {
-  quantity?: number;
-  id?: string;
-}
-
-// Default placeholder image
-const PLACEHOLDER_IMAGE = "https://static.wikia.nocookie.net/tibia/images/9/98/Backpack.gif/revision/latest?cb=20050521130034";
-
-// Add category to each item
-const categorizedItems = lootItems.map(item => ({
-  ...item,
-  category: item.category
-}));
-
-// Set up Fuse for fuzzy search
-const fuseOptions = {
-  keys: ['name'],
-  threshold: 0.3, // Lower threshold means stricter matching
-};
-
-const fuse = new Fuse(categorizedItems, fuseOptions);
+import { getCustomItems, deleteCustomItem } from './utils/local-storage';
+import placeholderBase64 from './utils/placeholder-base64';
+import { ItemCreateModal } from './components/item-create-modal';
+import { capitalize } from './utils/helpers';
 
 function App() {
   // State for form fields
@@ -43,19 +25,55 @@ function App() {
   const [lastUpdatedItemName, setLastUpdatedItemName] = useState<string | null>(null);
   const [isQuantityDecreasing, setIsQuantityDecreasing] = useState(false);
   const [lastTotalValue, setLastTotalValue] = useState<number>(0);
-  const [isTotalDecreasing, setIsTotalDecreasing] = useState(false);
   // Refs for form elements
   const searchResultsRef = useRef<HTMLDivElement>(null);
   const quantityInputRef = useRef<HTMLInputElement>(null);
   const itemNameInputRef = useRef<HTMLInputElement>(null);
   const animationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const [floatingValues, setFloatingValues] = useState<Array<{ id: number; value: number; isPositive: boolean }>>([]);
   const floatingValueIdRef = useRef(0);
   const bottomOfTable = useRef<HTMLDivElement>(null);
+  //other state fields
+  const [floatingValues, setFloatingValues] = useState<Array<{ id: number; value: number; isPositive: boolean }>>([]);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
+  const [customItems, setCustomItems] = useState<ExtendedItemData[]>([])
+  const [searchResultsKey, setSearchResultsKey] = useState(0);
+
+  useEffect(() => {
+    setCustomItems(getCustomItems())
+  }, [])
+
+  useEffect(() => {
+    // Always use the latest customItems and lootItems
+    let items = [...lootItems, ...customItems];
+    if (selectedCategory !== 'All') {
+      items = items.filter(item => item.category === selectedCategory);
+    }
+
+    const fuse = new Fuse(items, { keys: ['name'], threshold: 0.3 });
+    let results: ExtendedItemData[] = [];
+
+    if (searchQuery.trim() === '') {
+      results = items.sort((a, b) => a.name.localeCompare(b.name));
+    } else {
+      results = fuse.search(searchQuery).map(result => result.item);
+      // If no match, add a new custom item to the results
+      const showCreate = searchQuery.trim() && results.every(r => r.name.toLowerCase() !== searchQuery.trim().toLowerCase());
+      if (showCreate) {
+        results.push({
+          name: capitalize(searchQuery),
+          value: 0,
+          imageBase64: placeholderBase64,
+          category: "New Custom",
+          npcNames: ["+ New Custom Item"]
+        });
+      }
+    }
+    setSearchResults(results);
+  }, [searchQuery, selectedCategory, customItems]);
 
   // Get filtered and sorted items
   const filteredItems = useMemo(() => {
-    let items = [...categorizedItems];
+    let items = [...lootItems, ...customItems];
 
     // Filter by category if needed
     if (selectedCategory !== 'All') {
@@ -64,13 +82,12 @@ function App() {
 
     // Sort alphabetically by name
     return items.sort((a, b) => a.name.localeCompare(b.name));
-  }, [selectedCategory]);
+  }, [selectedCategory, customItems, searchResults]);
 
   // Calculate total value of all items
   const totalValue = useMemo(() => {
     const newTotal = tableEntries.reduce((sum, entry) => sum + entry.value, 0);
     if (newTotal !== lastTotalValue) {
-      setIsTotalDecreasing(newTotal < lastTotalValue);
       setLastTotalValue(newTotal);
     }
     return newTotal;
@@ -113,10 +130,20 @@ function App() {
       setTimeout(() => {
         if (quantityInputRef.current) {
           quantityInputRef.current.focus();
+          quantityInputRef.current.select();
         }
       }, 10);
     }
   };
+
+  const handleDeleteKeyUp = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.code === "Delete" && searchResults.length > 0 && searchResults[0].category === CATEGORIES.CUSTOM) {
+      const newCustomItems = customItems.filter(item => item.name !== searchResults[0].name)
+      setCustomItems(newCustomItems);
+      handleDeleteItem(searchResults[0].name ?? '', true);
+      handleSearchChange({ target: { value: searchQuery } } as React.ChangeEvent<HTMLInputElement>);
+    }
+  }
 
   // Handle key press in quantity input
   const handleQuantityKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -128,38 +155,28 @@ function App() {
 
   // Handle search input change
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const query = e.target.value;
+    const query = e.target.value.trim().slice(0, 30);
     setSearchQuery(query);
 
     if (query !== selectedItem?.name) {
       setSelectedItem(null);
     }
-
-    if (query.trim() === '') {
-      // Show alphabetically sorted items from the selected category
-      setSearchResults(filteredItems); // Show all items from the category
-      setShowResults(true);
-      return;
-    }
-
-    // Perform fuzzy search
-    let results = fuse.search(query).map(result => result.item);
-
-    // Filter by category if one is selected
-    if (selectedCategory !== 'All') {
-      results = results.filter(item => item.category === selectedCategory);
-    }
-
-    setSearchResults(results);
-    setShowResults(true);
   };
 
   // Handle selecting an item from search results
   const handleSelectItem = (item: ExtendedItemData) => {
-    setSelectedItem(item);
-    setSearchQuery(item.name);
-    setShowResults(false);
-    if (quantityInputRef.current) quantityInputRef.current.focus();
+    if (item.category === "New Custom" && !filteredItems.some(i => i.name.toLowerCase() === item.name.toLowerCase())) {
+      setIsCreateModalOpen(true)
+      setShowResults(false);
+    } else {
+      setSelectedItem(item);
+      setSearchQuery(item.name);
+      setShowResults(false);
+      if (quantityInputRef.current) {
+        quantityInputRef.current.focus();
+        quantityInputRef.current.select();
+      }
+    }
   };
 
   // Handle quantity change
@@ -188,7 +205,7 @@ function App() {
     if (!searchQuery.trim()) {
       // Find filtered items with the new category
       const newCategory = e.target.value;
-      let newFilteredItems = [...categorizedItems];
+      let newFilteredItems = [...filteredItems];
 
       if (newCategory !== 'All') {
         newFilteredItems = newFilteredItems.filter(item => item.category === newCategory);
@@ -340,14 +357,40 @@ function App() {
     }
   };
 
+  const handleCreatedCustomItem = useCallback(() => {
+    const newCustomItems = getCustomItems()
+    setCustomItems(newCustomItems)
+    const newCustomItem = newCustomItems[newCustomItems.length - 1]
+    setSelectedItem(newCustomItem)
+    setSearchQuery(newCustomItem.name)
+    // Use requestAnimationFrame to ensure state updates have completed
+    requestAnimationFrame(() => {
+      if (quantityInputRef.current) {
+        quantityInputRef.current.focus();
+        quantityInputRef.current.select();
+      }
+    });
+  }, [])
+
   // Delete item from table
-  const handleDeleteItem = (name: string) => {
+  const handleDeleteItem = (name: string, deleteFromCustomItems: boolean = false) => {
     const itemToDelete = tableEntries.find(entry => entry.name === name);
     if (itemToDelete) {
       handleAnimations(itemToDelete.name, true, itemToDelete.value * (itemToDelete.quantity ?? 1));
     }
     setTableEntries(tableEntries.filter(entry => entry.name !== name));
+    if (deleteFromCustomItems) {
+      const updatedCustomItems = deleteCustomItem(name);
+      setCustomItems(updatedCustomItems);
+      setSearchResultsKey(prev => prev + 1);
+    }
   };
+
+  const getNpcColor = (npcName: string) => {
+    if (npcName.startsWith("Alesar")) return 'text-green-600';
+    else if (npcName.startsWith("Nah'Bob")) return 'text-blue-600';
+    return '';
+  }
 
   // Close search results when clicking outside
   useEffect(() => {
@@ -423,6 +466,7 @@ function App() {
                   onFocus={handleSearchFocus}
                   onBlur={() => setIsItemNameInputFocused(false)}
                   onKeyPress={handleSearchKeyPress}
+                  onKeyUp={handleDeleteKeyUp}
                   onKeyDown={e => {
                     if (e.key === 'Escape') {
                       setSearchQuery('');
@@ -437,29 +481,12 @@ function App() {
 
                 {showResults && searchResults.length > 0 && (
                   <div
-                    className={`search-results ${!searchQuery.trim() ? 'grid-view' : 'list-view'}`}
+                    key={searchResultsKey}
+                    className={`search-results ${selectedCategory === CATEGORIES.CUSTOM || searchQuery.trim() ? 'list-view' : 'grid-view'}`}
                     ref={searchResultsRef}
                   >
 
-                    {!searchQuery.trim() ? (
-                      // Grid layout with image as background
-                      searchResults.map((item, index) => (
-                        <div
-                          key={index}
-                          className={`search-result-item${index === 0 ? ' search-result-item--active' : ''}`}
-                          onClick={() => handleSelectItem(item)}
-                        >
-                          <div
-                            className="item-bg"
-                            style={{ backgroundImage: `url('${item.imageBase64 || PLACEHOLDER_IMAGE}')` }}
-                          />
-                          <div className="item-content">
-                            <div className="item-value">{getDisplayValue(item.value)} gp</div>
-                            <div className="item-name">{item.name}</div>
-                          </div>
-                        </div>
-                      ))
-                    ) : (
+                    {selectedCategory === CATEGORIES.CUSTOM || searchQuery.trim() ? (
                       // Standard list layout
                       searchResults.map((item, index) => (
                         <div
@@ -468,10 +495,11 @@ function App() {
                           onClick={() => handleSelectItem(item)}
                         >
                           {searchQuery.trim().length > 0 && isItemNameInputFocused && <span className="search-results-enter-tip">Press ENTER to accept</span>}
+                          {item.category === CATEGORIES.CUSTOM && isItemNameInputFocused && <span className={` ${searchQuery.trim().length > 0 ? 'search-results-delete-tip' : "search-results-enter-tip"}`}>Press DEL to delete</span>}
                           <div className="item-row">
                             <div className="item-image">
                               <img
-                                src={item.imageBase64 || PLACEHOLDER_IMAGE}
+                                src={item.imageBase64 || placeholderBase64}
                                 alt={item.name}
                                 onError={handleImageError}
                               />
@@ -480,13 +508,31 @@ function App() {
                               <div className="item-name">{item.name}</div>
                               <div className="item-details">
                                 <span className="gold-text">{getDisplayValue(item.value)} gp</span>
-                                <span className="npc-indicator">
+                                <span className={`npc-indicator ${item.category === "New Custom" ? 'new-custom' : ''}`}>
                                   {item.npcNames.length > 1
                                     ? ` ${item.npcNames.length} NPCs`
                                     : ` ${item.npcNames[0]}`}
                                 </span>
                               </div>
                             </div>
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      // Grid layout with images
+                      searchResults.map((item, index) => (
+                        <div
+                          key={index}
+                          className={`search-result-item${index === 0 ? ' search-result-item--active' : ''}`}
+                          onClick={() => handleSelectItem(item)}
+                        >
+                          <div
+                            className="item-bg"
+                            style={{ backgroundImage: `url('${item.imageBase64 || placeholderBase64}')` }}
+                          />
+                          <div className="item-content">
+                            <div className="item-value">{getDisplayValue(item.value)} gp</div>
+                            <div className="item-name">{item.name}</div>
                           </div>
                         </div>
                       ))
@@ -521,7 +567,7 @@ function App() {
 
             <button type="submit" disabled={!selectedItem}>
               <p style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.5rem' }}>
-                Add {selectedItem ? `${quantity ?? 1}x` : ''} {selectedItem?.name ?? 'Item'} {selectedItem && <img src={selectedItem.imageBase64 || PLACEHOLDER_IMAGE} alt={selectedItem.name} className="item-image" onError={handleImageError} />}
+                Add {selectedItem ? `${quantity ?? 1}x` : ''} {selectedItem?.name ?? 'Item'} {selectedItem && <img src={selectedItem.imageBase64 || placeholderBase64} alt={selectedItem.name} className="item-image" onError={handleImageError} />}
               </p>
             </button>
           </form>
@@ -546,7 +592,7 @@ function App() {
                   <tr key={entry.id}>
                     <td>
                       <img
-                        src={entry.imageBase64 || PLACEHOLDER_IMAGE}
+                        src={entry.imageBase64 || placeholderBase64}
                         alt={entry.name}
                         className="table-item-image"
                         onError={handleImageError}
@@ -572,16 +618,16 @@ function App() {
                       </div>
                     </td>
                     <td style={{ textAlign: 'center', width: '40px' }}>
-                      <div className="tooltip-container">
+                      {entry.category !== CATEGORIES.CUSTOM && <div className="tooltip-container">
                         <span className="npc-count">{entry.npcNames.length}</span>
-                        <div className="tooltip">
+                        < div className="tooltip">
                           <div className="tooltip-content">
                             {entry.npcNames.map((npc) => (
-                              <span key={npc} className="tooltip-item">{npc}</span>
+                              <span key={npc} className={`tooltip-item ${getNpcColor(npc)}`}>{npc}</span>
                             ))}
                           </div>
                         </div>
-                      </div>
+                      </div>}
                     </td>
                     <td>
                       <button
@@ -626,7 +672,12 @@ function App() {
           </div>
         </div>
       )}
-
+      <ItemCreateModal
+        open={isCreateModalOpen}
+        name={searchQuery.trim().charAt(0).toUpperCase() + searchQuery.trim().slice(1)}
+        onClose={() => setIsCreateModalOpen(false)}
+        onCreated={handleCreatedCustomItem}
+      />
     </div>
   );
 }
