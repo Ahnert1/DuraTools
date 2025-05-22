@@ -10,7 +10,7 @@ const args = process.argv.slice(2);
 const skipImages = args.includes('--skip-images');
 
 // Path to the local HTML file
-const LOCAL_HTML_PATH = path.join(__dirname, '../src/data/htmlToScrape.html');
+const LOCAL_HTML_PATH = path.join(__dirname, '../src/data/htmlItemsToScrape.html');
 
 const getItemCategory = (itemName) => {
   const name = itemName.toLowerCase();

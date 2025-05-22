@@ -10,6 +10,7 @@ import { getCustomItems, deleteCustomItem } from './utils/local-storage';
 import placeholderBase64 from './utils/placeholder-base64';
 import { ItemCreateModal } from './components/item-create-modal';
 import { capitalize } from './utils/helpers';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from './@/components/ui/tabs';
 
 function App() {
   // State for form fields
@@ -437,219 +438,233 @@ function App() {
   return (
     <div className="container">
       <MiniHeaderCollage />
-      <div className="main-content">
-        <div className="form-section">
-          <form className="search-form" onSubmit={handleSubmit}>
-            <div className="form-group">
-              <label htmlFor="category-select">Category</label>
-              <select
-                id="category-select"
-                value={selectedCategory}
-                onChange={handleCategoryChange}
-                className="category-select"
-              >
-                {Object.values(CATEGORIES).map(category => (
-                  <option key={category} value={category}>{category}</option>
-                ))}
-              </select>
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="item-search">Item Name</label>
-              <div style={{ position: 'relative' }}>
-                <input
-                  ref={itemNameInputRef}
-                  id="item-search"
-                  type="text"
-                  value={searchQuery}
-                  onChange={handleSearchChange}
-                  onFocus={handleSearchFocus}
-                  onBlur={() => setIsItemNameInputFocused(false)}
-                  onKeyPress={handleSearchKeyPress}
-                  onKeyUp={handleDeleteKeyUp}
-                  onKeyDown={e => {
-                    if (e.key === 'Escape') {
-                      setSearchQuery('');
-                      setSearchResults(filteredItems);
-                      setSelectedItem(null);
-                    }
-                  }}
-                  placeholder="Search for an item..."
-                  autoComplete="off"
-                />
-                {searchQuery.trim().length > 0 && isItemNameInputFocused && <span className="search-results-esc-tip">Press ESC to clear</span>}
-
-                {showResults && searchResults.length > 0 && (
-                  <div
-                    key={searchResultsKey}
-                    className={`search-results ${selectedCategory === CATEGORIES.CUSTOM || searchQuery.trim() ? 'list-view' : 'grid-view'}`}
-                    ref={searchResultsRef}
+      <Tabs defaultValue="calculator" className="w-full">
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="calculator">Calculator</TabsTrigger>
+          <TabsTrigger value="raids">Raids</TabsTrigger>
+        </TabsList>
+        <TabsContent value="calculator">
+          <div className="main-content">
+            <div className="form-section">
+              <form className="search-form" onSubmit={handleSubmit}>
+                <div className="form-group">
+                  <label htmlFor="category-select">Category</label>
+                  <select
+                    id="category-select"
+                    value={selectedCategory}
+                    onChange={handleCategoryChange}
+                    className="category-select"
                   >
+                    {Object.values(CATEGORIES).map(category => (
+                      <option key={category} value={category}>{category}</option>
+                    ))}
+                  </select>
+                </div>
 
-                    {selectedCategory === CATEGORIES.CUSTOM || searchQuery.trim() ? (
-                      // Standard list layout
-                      searchResults.map((item, index) => (
-                        <div
-                          key={index}
-                          className={`search-result-item${index === 0 ? ' search-result-item--active' : ''}`}
-                          onClick={() => handleSelectItem(item)}
-                        >
-                          {searchQuery.trim().length > 0 && isItemNameInputFocused && <span className="search-results-enter-tip">Press ENTER to accept</span>}
-                          {item.category === CATEGORIES.CUSTOM && isItemNameInputFocused && <span className={` ${searchQuery.trim().length > 0 ? 'search-results-delete-tip' : "search-results-enter-tip"}`}>Press DEL to delete</span>}
-                          <div className="item-row">
-                            <div className="item-image">
-                              <img
-                                src={item.imageBase64 || placeholderBase64}
-                                alt={item.name}
-                                onError={handleImageError}
-                              />
-                            </div>
-                            <div className="item-content">
-                              <div className="item-name">{item.name}</div>
-                              <div className="item-details">
-                                <span className="gold-text">{item.category === "New Custom" ? '?' : getDisplayValue(item.value)} gp</span>
-                                <span className={`npc-indicator ${item.category === "New Custom" ? 'new-custom' : ''}`}>
-                                  {item.npcNames.length > 1
-                                    ? ` ${item.npcNames.length} NPCs`
-                                    : ` ${item.npcNames[0]}`}
-                                </span>
+                <div className="form-group">
+                  <label htmlFor="item-search">Item Name</label>
+                  <div style={{ position: 'relative' }}>
+                    <input
+                      ref={itemNameInputRef}
+                      id="item-search"
+                      type="text"
+                      value={searchQuery}
+                      onChange={handleSearchChange}
+                      onFocus={handleSearchFocus}
+                      onBlur={() => setIsItemNameInputFocused(false)}
+                      onKeyPress={handleSearchKeyPress}
+                      onKeyUp={handleDeleteKeyUp}
+                      onKeyDown={e => {
+                        if (e.key === 'Escape') {
+                          setSearchQuery('');
+                          setSearchResults(filteredItems);
+                          setSelectedItem(null);
+                        }
+                      }}
+                      placeholder="Search for an item..."
+                      autoComplete="off"
+                    />
+                    {searchQuery.trim().length > 0 && isItemNameInputFocused && <span className="search-results-esc-tip">Press ESC to clear</span>}
+
+                    {showResults && searchResults.length > 0 && (
+                      <div
+                        key={searchResultsKey}
+                        className={`search-results ${selectedCategory === CATEGORIES.CUSTOM || searchQuery.trim() ? 'list-view' : 'grid-view'}`}
+                        ref={searchResultsRef}
+                      >
+
+                        {selectedCategory === CATEGORIES.CUSTOM || searchQuery.trim() ? (
+                          // Standard list layout
+                          searchResults.map((item, index) => (
+                            <div
+                              key={index}
+                              className={`search-result-item${index === 0 ? ' search-result-item--active' : ''}`}
+                              onClick={() => handleSelectItem(item)}
+                            >
+                              {searchQuery.trim().length > 0 && isItemNameInputFocused && <span className="search-results-enter-tip">Press ENTER to accept</span>}
+                              {item.category === CATEGORIES.CUSTOM && isItemNameInputFocused && <span className={` ${searchQuery.trim().length > 0 ? 'search-results-delete-tip' : "search-results-enter-tip"}`}>Press DEL to delete</span>}
+                              <div className="item-row">
+                                <div className="item-image">
+                                  <img
+                                    src={item.imageBase64 || placeholderBase64}
+                                    alt={item.name}
+                                    onError={handleImageError}
+                                  />
+                                </div>
+                                <div className="item-content">
+                                  <div className="item-name">{item.name}</div>
+                                  <div className="item-details">
+                                    <span className="gold-text">{item.category === "New Custom" ? '?' : getDisplayValue(item.value)} gp</span>
+                                    <span className={`npc-indicator ${item.category === "New Custom" ? 'new-custom' : ''}`}>
+                                      {item.npcNames.length > 1
+                                        ? ` ${item.npcNames.length} NPCs`
+                                        : ` ${item.npcNames[0]}`}
+                                    </span>
+                                  </div>
+                                </div>
                               </div>
                             </div>
+                          ))
+                        ) : (
+                          // Grid layout with images
+                          searchResults.map((item, index) => (
+                            <div
+                              key={index}
+                              className={`search-result-item${index === 0 ? ' search-result-item--active' : ''}`}
+                              onClick={() => handleSelectItem(item)}
+                            >
+                              <div
+                                className="item-bg"
+                                style={{ backgroundImage: `url('${item.imageBase64 || placeholderBase64}')` }}
+                              />
+                              <div className="item-content">
+                                <div className="item-value">{getDisplayValue(item.value)} gp</div>
+                                <div className="item-name">{item.name}</div>
+                              </div>
+                            </div>
+                          ))
+                        )}
+                        {filteredItems.length > 0 && (
+                          <div className="search-results-footer">
+                            Showing {searchResults.length} {searchResults.length == 1 ? "item" : "items"}{searchQuery.trim() ? " matching your search" : " in this category"}.
                           </div>
-                        </div>
-                      ))
-                    ) : (
-                      // Grid layout with images
-                      searchResults.map((item, index) => (
-                        <div
-                          key={index}
-                          className={`search-result-item${index === 0 ? ' search-result-item--active' : ''}`}
-                          onClick={() => handleSelectItem(item)}
-                        >
-                          <div
-                            className="item-bg"
-                            style={{ backgroundImage: `url('${item.imageBase64 || placeholderBase64}')` }}
-                          />
-                          <div className="item-content">
-                            <div className="item-value">{getDisplayValue(item.value)} gp</div>
-                            <div className="item-name">{item.name}</div>
-                          </div>
-                        </div>
-                      ))
-                    )}
-                    {filteredItems.length > 0 && (
-                      <div className="search-results-footer">
-                        Showing {searchResults.length} {searchResults.length == 1 ? "item" : "items"}{searchQuery.trim() ? " matching your search" : " in this category"}.
+                        )}
                       </div>
                     )}
+                  </div>
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="quantity">Quantity</label>
+                  <input
+                    id="quantity"
+                    type="number"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                    min="0"
+                    placeholder="1"
+                    autoComplete='off'
+                    max="9999"
+                    value={quantity ?? ''}
+                    onChange={handleQuantityChange}
+                    onKeyPress={handleQuantityKeyPress}
+                    ref={quantityInputRef}
+                  />
+                </div>
+
+                <button type="submit" disabled={!selectedItem}>
+                  <p style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.5rem' }}>
+                    Add {selectedItem ? `${quantity ?? 1}x` : ''} {selectedItem?.name ?? 'Item'} {selectedItem && <img src={selectedItem.imageBase64 || placeholderBase64} alt={selectedItem.name} className="item-image" onError={handleImageError} />}
+                  </p>
+                </button>
+              </form>
+            </div>
+            <div style={{ width: '100%' }}>
+
+              <HeaderCollage />
+              <div className="inventory-section">
+                <table className="item-table">
+                  <thead >
+                    <tr>
+                      <th style={{ width: '40px' }}></th>
+                      <th>Item Name</th>
+                      <th>Quantity</th>
+                      <th>Value</th>
+                      <th>NPC(s)</th>
+                      <th>Delete</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {tableEntries.map((entry) => (
+                      <tr key={entry.id}>
+                        <td>
+                          <img
+                            src={entry.imageBase64 || placeholderBase64}
+                            alt={entry.name}
+                            className="table-item-image"
+                            onError={handleImageError}
+                          />
+                        </td>
+                        <td>{entry.name}</td>
+
+                        <td>
+                          <input
+                            type="number"
+                            min="0"
+                            max="9999"
+                            value={entry.quantity}
+                            onChange={(e) => handleUpdateQuantity(entry.id ?? '', parseInt(e.target.value, 10) || 1)}
+                            className={`quantity-input ${lastUpdatedItemName === entry.name ? (isQuantityDecreasing ? 'highlight-update-decrease' : 'highlight-update') : ''}`}
+                          />
+                        </td>
+                        <td style={{ minWidth: '140px', maxWidth: '140px', verticalAlign: 'middle', padding: '0px 0px 0px 10px' }}>
+                          <div style={{ minHeight: "70px", display: 'flex', alignItems: 'center' }}>
+                            @
+                            <span className="gold-text">{(entry.value / (entry.quantity ?? 1)) > 1000 ? `${(entry.value / (entry.quantity ?? 1)) / 1000}k` : (entry.value / (entry.quantity ?? 1))} = </span>
+                            <span className={`calculated-item-total ${lastUpdatedItemName === entry.name ? (isQuantityDecreasing ? 'less-gold-animation' : 'more-gold-animation') : ''}`}>&nbsp;{getDisplayValue(entry.value)}</span>
+                          </div>
+                        </td>
+                        <td style={{ textAlign: 'center', width: '40px' }}>
+                          {entry.category !== CATEGORIES.CUSTOM && <div className="tooltip-container">
+                            <span className="npc-count">&#9432;</span>
+                            < div className="tooltip">
+                              <div className="tooltip-content">
+                                {entry.npcNames.map((npc) => (
+                                  <span key={npc} className={`tooltip-item ${getNpcColor(npc)}`}>{npc}</span>
+                                ))}
+                              </div>
+                            </div>
+                          </div>}
+                        </td>
+                        <td>
+                          <button
+                            onClick={() => handleDeleteItem(entry.name ?? '')}
+                            className="delete-button"
+                            title="Remove entry"
+                          >
+                            ✕
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                {tableEntries.length == 0 && (
+                  <div className="no-items-message">
+                    No items added yet
                   </div>
                 )}
               </div>
             </div>
-
-            <div className="form-group">
-              <label htmlFor="quantity">Quantity</label>
-              <input
-                id="quantity"
-                type="number"
-                inputMode="numeric"
-                pattern="[0-9]*"
-                min="0"
-                placeholder="1"
-                autoComplete='off'
-                max="9999"
-                value={quantity ?? ''}
-                onChange={handleQuantityChange}
-                onKeyPress={handleQuantityKeyPress}
-                ref={quantityInputRef}
-              />
-            </div>
-
-            <button type="submit" disabled={!selectedItem}>
-              <p style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.5rem' }}>
-                Add {selectedItem ? `${quantity ?? 1}x` : ''} {selectedItem?.name ?? 'Item'} {selectedItem && <img src={selectedItem.imageBase64 || placeholderBase64} alt={selectedItem.name} className="item-image" onError={handleImageError} />}
-              </p>
-            </button>
-          </form>
-        </div>
-        <div style={{ width: '100%' }}>
-
-          <HeaderCollage />
-          <div className="inventory-section">
-            <table className="item-table">
-              <thead >
-                <tr>
-                  <th style={{ width: '40px' }}></th>
-                  <th>Item Name</th>
-                  <th>Quantity</th>
-                  <th>Value</th>
-                  <th>NPC(s)</th>
-                  <th>Delete</th>
-                </tr>
-              </thead>
-              <tbody>
-                {tableEntries.map((entry) => (
-                  <tr key={entry.id}>
-                    <td>
-                      <img
-                        src={entry.imageBase64 || placeholderBase64}
-                        alt={entry.name}
-                        className="table-item-image"
-                        onError={handleImageError}
-                      />
-                    </td>
-                    <td>{entry.name}</td>
-
-                    <td>
-                      <input
-                        type="number"
-                        min="0"
-                        max="9999"
-                        value={entry.quantity}
-                        onChange={(e) => handleUpdateQuantity(entry.id ?? '', parseInt(e.target.value, 10) || 1)}
-                        className={`quantity-input ${lastUpdatedItemName === entry.name ? (isQuantityDecreasing ? 'highlight-update-decrease' : 'highlight-update') : ''}`}
-                      />
-                    </td>
-                    <td style={{ minWidth: '140px', maxWidth: '140px', verticalAlign: 'middle', padding: '0px 0px 0px 10px' }}>
-                      <div style={{ minHeight: "70px", display: 'flex', alignItems: 'center' }}>
-                        @
-                        <span className="gold-text">{(entry.value / (entry.quantity ?? 1)) > 1000 ? `${(entry.value / (entry.quantity ?? 1)) / 1000}k` : (entry.value / (entry.quantity ?? 1))} = </span>
-                        <span className={`calculated-item-total ${lastUpdatedItemName === entry.name ? (isQuantityDecreasing ? 'less-gold-animation' : 'more-gold-animation') : ''}`}>&nbsp;{getDisplayValue(entry.value)}</span>
-                      </div>
-                    </td>
-                    <td style={{ textAlign: 'center', width: '40px' }}>
-                      {entry.category !== CATEGORIES.CUSTOM && <div className="tooltip-container">
-                        <span className="npc-count">{entry.npcNames.length}</span>
-                        < div className="tooltip">
-                          <div className="tooltip-content">
-                            {entry.npcNames.map((npc) => (
-                              <span key={npc} className={`tooltip-item ${getNpcColor(npc)}`}>{npc}</span>
-                            ))}
-                          </div>
-                        </div>
-                      </div>}
-                    </td>
-                    <td>
-                      <button
-                        onClick={() => handleDeleteItem(entry.name ?? '')}
-                        className="delete-button"
-                        title="Remove entry"
-                      >
-                        ✕
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-            {tableEntries.length == 0 && (
-              <div className="no-items-message">
-                No items added yet
-              </div>
-            )}
           </div>
-        </div>
-      </div>
+        </TabsContent>
+        <TabsContent value="raids">
+          <div className="p-6">
+            <h2 className="text-2xl font-bold mb-4">Raids</h2>
+            <p className="text-muted-foreground">Coming soon...</p>
+          </div>
+        </TabsContent>
+      </Tabs>
 
       <div style={{ position: "absolute", height: "100px" }} ref={bottomOfTable} />
 

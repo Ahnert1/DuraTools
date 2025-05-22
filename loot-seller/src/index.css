@@ -270,10 +270,10 @@ button:disabled {
 }
 
 .npc-count {
-  font-size: 1rem;
+  font-size: 1.6rem;
+  font-weight: bold;
   padding: 2px 6px;
   cursor: help;
-  text-decoration: underline dotted;
 }
 
 .npc-indicator {
@@ -934,6 +934,7 @@ button:disabled {
 
 .no-items-message{
   text-align: center;
+  padding: 1rem;
 }
 
 .search-results-esc-tip {
