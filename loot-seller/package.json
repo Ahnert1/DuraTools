@@ -9,8 +9,10 @@
     "build:single": "react-scripts build && node scripts/createSingleFile.js",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "scrape-data-and-images": "node scripts/scrapeItems.js",
-    "scrape-data": "node scripts/scrapeItems.js --skip-images"
+    "scrape-items-and-images": "node scripts/scrapeItems.js",
+    "scrape-items": "node scripts/scrapeItems.js --skip-images",
+    "scrape-some-raids": "node scripts/scrapeRaids.js --limit=10",
+    "scrape-raids": "node scripts/scrapeRaids.js"
   },
   "keywords": [
     "react",
@@ -26,6 +28,7 @@
     "@radix-ui/react-tabs": "^1.1.12",
     "@types/react": "^18.2.15",
     "@types/react-dom": "^18.2.7",
+    "axios": "^1.6.7",
     "cheerio": "^1.0.0",
     "clsx": "^2.1.1",
     "fuse.js": "^7.0.0",
