@@ -1,5 +1,5 @@
 // This file is auto-generated. Do not edit manually.
-// Generated on: 2025-05-23T05:12:44.735Z
+// Generated on: 2025-05-27T03:46:53.026Z
 
 export interface Raid {
   href: string;
@@ -679,12 +679,10 @@ export const raidData: Raid[] = [
     "location": "Kha'zeel Dragon Lairs",
     "mobs": [
       "Orc",
-      "Orc Spearm",
-      "an",
+      "Orc Spearman",
       "Orc Warrior",
       "Orc Shaman",
-      "Orc",
-      "Leader",
+      "Orc Leader",
       "Orc Warlord"
     ],
     "bosses": [],
@@ -989,8 +987,7 @@ export const raidData: Raid[] = [
     "name": "Theristrut's Shrine",
     "location": "Bow of the Kha'labal Quest Room",
     "mobs": [
-      "Slime",
-      "Ooze"
+      "Slime Ooze"
     ],
     "bosses": [],
     "floors": [
@@ -2180,7 +2177,6 @@ export const raidData: Raid[] = [
     ],
     "floors": [
       "-4",
-      "or",
       "-6"
     ],
     "timeToSpawn": "Spawns before raid message"
@@ -2220,7 +2216,6 @@ export const raidData: Raid[] = [
     ],
     "floors": [
       "-5",
-      "or",
       "-6"
     ],
     "timeToSpawn": "Spawns before raid message"
@@ -2550,8 +2545,7 @@ export const raidData: Raid[] = [
     "name": "Dwarves Gather Mushroom",
     "location": "Femor Hills",
     "mobs": [
-      "Dwar",
-      "f",
+      "Dwarf",
       "Orc Rider"
     ],
     "bosses": [],
@@ -2569,8 +2563,7 @@ export const raidData: Raid[] = [
     "name": "Dwarves Gather Timber",
     "location": "In the way to Orc Fortress",
     "mobs": [
-      "Dwar",
-      "f"
+      "Dwarf"
     ],
     "bosses": [],
     "floors": [
@@ -2741,8 +2734,7 @@ export const raidData: Raid[] = [
       "Minotaur",
       "Minotaur Archer",
       "Minotaur Mage",
-      "Minotau",
-      "r Guard"
+      "Minotaur Guard"
     ],
     "bosses": [],
     "floors": [
@@ -2869,8 +2861,7 @@ export const raidData: Raid[] = [
     "name": "Orc Fortress Warlords",
     "location": "Orc Fortress",
     "mobs": [
-      "Orc",
-      "Warlord"
+      "Orc Warlord"
     ],
     "bosses": [],
     "floors": [
@@ -3713,8 +3704,7 @@ export const raidData: Raid[] = [
     "name": "Wolves Threading Thick",
     "location": "Northern Thais",
     "mobs": [
-      "Wol",
-      "f"
+      "Wolf"
     ],
     "bosses": [],
     "floors": [
@@ -3732,8 +3722,7 @@ export const raidData: Raid[] = [
     "location": "Venore",
     "mobs": [
       "Amazon",
-      "Valkyri",
-      "e"
+      "Valkyrie"
     ],
     "bosses": [],
     "floors": [

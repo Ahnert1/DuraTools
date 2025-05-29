@@ -3,6 +3,9 @@ const cheerio = require('cheerio');
 const fs = require('fs');
 const path = require('path');
 
+// Add new Map to store mob URLs
+const mobUrlMap = new Map();
+
 // Interface for Raid data
 /**
  * @typedef {Object} Raid
@@ -46,10 +49,20 @@ function extractPropertyValue($, propertyName) {
 
     // Special handling for mobs array
     if (propertyName === 'mobs') {
-        // Get all mob names from spans within links
+        // Get all mob names and URLs from links
         const mobs = valueContainer
-            .find('a.XqQF9c span.C9DxTc.aw5Odc')
-            .map((_, el) => $(el).text().trim())
+            .find('a.XqQF9c')
+            .map((_, el) => {
+                const mobName = $(el).find('span.C9DxTc.aw5Odc').text().trim();
+                const href = $(el).attr('href');
+
+                // Store mob URL in the map if it's a valid mob name
+                if (mobName && mobName !== '-' && href) {
+                    mobUrlMap.set(mobName, href);
+                }
+
+                return mobName;
+            })
             .get()
             .filter(Boolean)
             .filter(name => name && name !== '-');
@@ -77,8 +90,8 @@ function extractPropertyValue($, propertyName) {
         for (let i = 0; i < spans.length; i++) {
             const currentText = $(spans[i]).text().trim();
 
-            // Skip empty spans or <br> tags
-            if (!currentText || currentText === '<br>') continue;
+            // Skip empty spans or <br> tags and the word "or"
+            if (!currentText || currentText === '<br>' || currentText === 'or') continue;
 
             // If current span is just a sign and there's a next span
             if ((currentText === '-' || currentText === '+') && i + 1 < spans.length) {
@@ -273,6 +286,30 @@ export const raidData: Raid[] = ${JSON.stringify(raidArray, null, 2)};
 }
 
 /**
+ * Saves mob URL data to a JavaScript file
+ */
+function saveMobUrlsToFile() {
+    const outputPath = path.join(__dirname, 'mobUrlMap.js');
+
+    // Convert Map to array of objects
+    const mobUrlArray = Array.from(mobUrlMap.entries()).map(([mob, href]) => ({
+        mob,
+        href
+    }));
+
+    const fileContent = `// This file is auto-generated. Do not edit manually.
+// Generated on: ${new Date().toISOString()}
+
+module.exports = {
+    mobUrls: ${JSON.stringify(mobUrlArray, null, 2)}
+};
+`;
+
+    fs.writeFileSync(outputPath, fileContent);
+    console.log(`Mob URL data saved to ${outputPath}`);
+}
+
+/**
  * Main function to run the scraper
  */
 async function main() {
@@ -284,6 +321,7 @@ async function main() {
         console.log(limit ? `Scraping first ${limit} raids...` : 'Scraping all raids...');
         const raids = await scrapeRaids(limit);
         saveRaidsToFile(raids);
+        saveMobUrlsToFile();
         console.log('Scraping completed successfully!');
     } catch (error) {
         console.error('Error in main:', error);

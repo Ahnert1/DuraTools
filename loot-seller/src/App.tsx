@@ -5,12 +5,14 @@ import { ExtendedItemData } from './models/ExtendedItemData';
 import { handleImageError } from './utils/imageUtils';
 import { CATEGORIES } from './enums/Categories';
 import { HeaderCollage } from './components/HeaderCollage';
-import { MiniHeaderCollage } from './components/MiniHeaderCollage';
 import { getCustomItems, deleteCustomItem } from './utils/local-storage';
 import placeholderBase64 from './utils/placeholder-base64';
-import { ItemCreateModal } from './components/item-create-modal';
 import { capitalize } from './utils/helpers';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from './@/components/ui/tabs';
+import { Textarea } from "./@/components/ui/textarea";
+import { raidData } from './data/raidData';
+import { ParsedRaid } from './models/ParsedRaid';
+import MobCell from './components/MobCell';
 
 function App() {
   // State for form fields
@@ -38,6 +40,12 @@ function App() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
   const [customItems, setCustomItems] = useState<ExtendedItemData[]>([])
   const [searchResultsKey, setSearchResultsKey] = useState(0);
+  // Add new state for active tab
+  const [activeTab, setActiveTab] = useState("raids");
+  // Add these state variables in the App component
+  const [raidLogInput, setRaidLogInput] = useState('');
+  const [parsedRaids, setParsedRaids] = useState<ParsedRaid[]>([]);
+  const [raidViewMode, setRaidViewMode] = useState<'time' | 'location'>('time');
 
   useEffect(() => {
     setCustomItems(getCustomItems())
@@ -435,14 +443,210 @@ function App() {
     return entriesByNpc;
   }, [tableEntries]);
 
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+  };
+
+  const parseRaidLog = (input: string) => {
+    const lines = input.split('\n').filter(line => line.trim());
+    const raids: ParsedRaid[] = [];
+
+    lines.forEach(line => {
+      // Extract elapsed time
+      const timeMatch = line.match(/\(\s*(\d+)\s+minutes?\s+ago\s*\)/i);
+      const elapsedTime = timeMatch ? timeMatch[1] : '';
+
+      // Remove timestamp and elapsed time from the line
+      const cleanLine = line
+        .replace(/^\d{2}:\d{2}\s+/, '') // Remove timestamp
+        .replace(/\s*\(\d+\s+minutes?\s+ago\)\s*$/, '') // Remove elapsed time
+        .trim();
+
+      // Find matching raid
+      const matchingRaid = raidData.find(raid => {
+        const messages = [
+          raid.firstMessage,
+          raid.bossMessage
+        ].filter(Boolean);
+
+        return messages.some(message =>
+          cleanLine.toLowerCase().includes(message.toLowerCase())
+        );
+      });
+
+      if (matchingRaid) {
+        raids.push({
+          name: matchingRaid.name,
+          mobs: matchingRaid.mobs,
+          elapsedTime: elapsedTime ? `${elapsedTime} minutes ago` : '',
+          location: matchingRaid.location
+        });
+      }
+    });
+
+    setParsedRaids(raids);
+  };
+
+  // Add this effect in the App component
+  useEffect(() => {
+    parseRaidLog(raidLogInput);
+  }, [raidLogInput]);
+
+  // Add this new function to sort/group raids
+  const getSortedRaids = useMemo(() => {
+    if (raidViewMode === 'time') {
+      return [...parsedRaids].sort((a, b) => {
+        const timeA = parseInt(a.elapsedTime) || 0;
+        const timeB = parseInt(b.elapsedTime) || 0;
+        return timeA - timeB;
+      });
+    } else {
+      // Group by location
+      const groupedRaids = parsedRaids.reduce((acc, raid) => {
+        if (!acc[raid.location]) {
+          acc[raid.location] = [];
+        }
+        acc[raid.location].push(raid);
+        return acc;
+      }, {} as Record<string, ParsedRaid[]>);
+
+      // Sort locations alphabetically
+      return Object.entries(groupedRaids)
+        .sort(([locA], [locB]) => locA.localeCompare(locB))
+        .map(([location, raids]) => ({
+          location,
+          raids: raids.sort((a, b) => {
+            const timeA = parseInt(a.elapsedTime) || 0;
+            const timeB = parseInt(b.elapsedTime) || 0;
+            return timeA - timeB;
+          })
+        }));
+    }
+  }, [parsedRaids, raidViewMode]) as ParsedRaid[] | { location: string; raids: ParsedRaid[] }[];
+
+  // Type guard to check if a raid is a ParsedRaid
+  const isParsedRaid = (raid: ParsedRaid | { location: string; raids: ParsedRaid[] }): raid is ParsedRaid => {
+    return 'name' in raid && 'mobs' in raid && 'elapsedTime' in raid;
+  };
+
   return (
     <div className="container">
-      <MiniHeaderCollage />
-      <Tabs defaultValue="calculator" className="w-full">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="calculator">Calculator</TabsTrigger>
-          <TabsTrigger value="raids">Raids</TabsTrigger>
-        </TabsList>
+      <div className="header-collage-mobile">
+        <HeaderCollage activeTab={activeTab} />
+      </div>
+      <Tabs defaultValue="raids" onValueChange={handleTabChange}>
+        <div className="tabs-container">
+          <TabsList className="flex gap-10">
+            <TabsTrigger value="raids">Raids</TabsTrigger>
+            <TabsTrigger value="calculator">Calculator</TabsTrigger>
+          </TabsList>
+        </div>
+        <TabsContent value="raids">
+          <div className="main-content">
+            <div className="form-section">
+              <div className="search-form">
+                <div className="form-group">
+                  <label htmlFor="raid-log">Raid Log Input</label>
+                  <Textarea
+                    id="raid-log"
+                    placeholder="Paste your raid log here..."
+                    value={raidLogInput}
+                    onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setRaidLogInput(e.target.value)}
+                    className="min-h-[400px]"
+                  />
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      try {
+                        const text = await navigator.clipboard.readText();
+                        setRaidLogInput(text);
+                      } catch (err) {
+                        console.error('Failed to read clipboard:', err);
+                      }
+                    }}
+                    className="mt-2"
+                  >
+                    Paste from Clipboard
+                  </button>
+                </div>
+                <div className="form-group">
+                  <label htmlFor="view-mode">View Mode</label>
+                  <select
+                    id="view-mode"
+                    value={raidViewMode}
+                    onChange={(e) => setRaidViewMode(e.target.value as 'time' | 'location')}
+                    className="category-select"
+                  >
+                    <option value="time">Sort by Time</option>
+                    <option value="location">Group by Location</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            <div style={{ width: '100%' }}>
+              <div className="inventory-section">
+                <table className="item-table">
+                  <thead>
+                    <tr>
+                      <th>Raid Name</th>
+                      <th>Mobs</th>
+                      {raidViewMode != 'location' && <th>Location</th>}
+                      <th>Time</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {raidViewMode === 'time' ? (
+                      // Time-based view
+                      (getSortedRaids as ParsedRaid[]).map((raid: ParsedRaid, index: number) => (
+                        <tr key={index}>
+                          <td>{raid.name}</td>
+                          <td>
+                            <div className="flex flex-wrap gap-4">
+                              {raid.mobs.map((mobName: string, mobIndex: number) => (
+                                <MobCell key={mobIndex} mobName={mobName} />
+                              ))}
+                            </div>
+                          </td>
+                          <td>{raid.location}</td>
+                          <td>{raid.elapsedTime}</td>
+                        </tr>
+                      ))
+                    ) : (
+                      // Location-based view
+                      (getSortedRaids as { location: string; raids: ParsedRaid[] }[]).map(({ location, raids }) => (
+                        <React.Fragment key={location}>
+                          <tr className="bg-gray-100">
+                            <td colSpan={4} className="font-bold text-lg py-2">
+                              {location}
+                            </td>
+                          </tr>
+                          {raids.map((raid: ParsedRaid, index: number) => (
+                            <tr key={`${location}-${index}`}>
+                              <td>{raid.name}</td>
+                              <td>
+                                <div className="flex flex-wrap gap-4">
+                                  {raid.mobs.map((mobName: string, mobIndex: number) => (
+                                    <MobCell key={mobIndex} mobName={mobName} />
+                                  ))}
+                                </div>
+                              </td>
+                              <td>{raid.elapsedTime}</td>
+                            </tr>
+                          ))}
+                        </React.Fragment>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+                {parsedRaids.length === 0 && (
+                  <div className="no-items-message">
+                    {"<--"} Paste your entire raid log for analysis
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </TabsContent>
         <TabsContent value="calculator">
           <div className="main-content">
             <div className="form-section">
@@ -535,166 +739,33 @@ function App() {
                             >
                               <div
                                 className="item-bg"
-                                style={{ backgroundImage: `url('${item.imageBase64 || placeholderBase64}')` }}
-                              />
+                                style={{ backgroundImage: `url(${item.imageBase64 || placeholderBase64})` }}
+                              ></div>
                               <div className="item-content">
-                                <div className="item-value">{getDisplayValue(item.value)} gp</div>
                                 <div className="item-name">{item.name}</div>
+                                <div className="item-details">
+                                  <span className="gold-text">{getDisplayValue(item.value)} gp</span>
+                                  <span className={`npc-indicator ${item.category === "New Custom" ? 'new-custom' : ''}`}>
+                                    {item.npcNames.length > 1
+                                      ? ` ${item.npcNames.length} NPCs`
+                                      : ` ${item.npcNames[0]}`}
+                                  </span>
+                                </div>
                               </div>
                             </div>
                           ))
-                        )}
-                        {filteredItems.length > 0 && (
-                          <div className="search-results-footer">
-                            Showing {searchResults.length} {searchResults.length == 1 ? "item" : "items"}{searchQuery.trim() ? " matching your search" : " in this category"}.
-                          </div>
                         )}
                       </div>
                     )}
                   </div>
                 </div>
-
-                <div className="form-group">
-                  <label htmlFor="quantity">Quantity</label>
-                  <input
-                    id="quantity"
-                    type="number"
-                    inputMode="numeric"
-                    pattern="[0-9]*"
-                    min="0"
-                    placeholder="1"
-                    autoComplete='off'
-                    max="9999"
-                    value={quantity ?? ''}
-                    onChange={handleQuantityChange}
-                    onKeyPress={handleQuantityKeyPress}
-                    ref={quantityInputRef}
-                  />
-                </div>
-
-                <button type="submit" disabled={!selectedItem}>
-                  <p style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.5rem' }}>
-                    Add {selectedItem ? `${quantity ?? 1}x` : ''} {selectedItem?.name ?? 'Item'} {selectedItem && <img src={selectedItem.imageBase64 || placeholderBase64} alt={selectedItem.name} className="item-image" onError={handleImageError} />}
-                  </p>
-                </button>
               </form>
             </div>
-            <div style={{ width: '100%' }}>
-
-              <HeaderCollage />
-              <div className="inventory-section">
-                <table className="item-table">
-                  <thead >
-                    <tr>
-                      <th style={{ width: '40px' }}></th>
-                      <th>Item Name</th>
-                      <th>Quantity</th>
-                      <th>Value</th>
-                      <th>NPC(s)</th>
-                      <th>Delete</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {tableEntries.map((entry) => (
-                      <tr key={entry.id}>
-                        <td>
-                          <img
-                            src={entry.imageBase64 || placeholderBase64}
-                            alt={entry.name}
-                            className="table-item-image"
-                            onError={handleImageError}
-                          />
-                        </td>
-                        <td>{entry.name}</td>
-
-                        <td>
-                          <input
-                            type="number"
-                            min="0"
-                            max="9999"
-                            value={entry.quantity}
-                            onChange={(e) => handleUpdateQuantity(entry.id ?? '', parseInt(e.target.value, 10) || 1)}
-                            className={`quantity-input ${lastUpdatedItemName === entry.name ? (isQuantityDecreasing ? 'highlight-update-decrease' : 'highlight-update') : ''}`}
-                          />
-                        </td>
-                        <td style={{ minWidth: '140px', maxWidth: '140px', verticalAlign: 'middle', padding: '0px 0px 0px 10px' }}>
-                          <div style={{ minHeight: "70px", display: 'flex', alignItems: 'center' }}>
-                            @
-                            <span className="gold-text">{(entry.value / (entry.quantity ?? 1)) > 1000 ? `${(entry.value / (entry.quantity ?? 1)) / 1000}k` : (entry.value / (entry.quantity ?? 1))} = </span>
-                            <span className={`calculated-item-total ${lastUpdatedItemName === entry.name ? (isQuantityDecreasing ? 'less-gold-animation' : 'more-gold-animation') : ''}`}>&nbsp;{getDisplayValue(entry.value)}</span>
-                          </div>
-                        </td>
-                        <td style={{ textAlign: 'center', width: '40px' }}>
-                          {entry.category !== CATEGORIES.CUSTOM && <div className="tooltip-container">
-                            <span className="npc-count">&#9432;</span>
-                            < div className="tooltip">
-                              <div className="tooltip-content">
-                                {entry.npcNames.map((npc) => (
-                                  <span key={npc} className={`tooltip-item ${getNpcColor(npc)}`}>{npc}</span>
-                                ))}
-                              </div>
-                            </div>
-                          </div>}
-                        </td>
-                        <td>
-                          <button
-                            onClick={() => handleDeleteItem(entry.name ?? '')}
-                            className="delete-button"
-                            title="Remove entry"
-                          >
-                            ✕
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-                {tableEntries.length == 0 && (
-                  <div className="no-items-message">
-                    No items added yet
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        </TabsContent>
-        <TabsContent value="raids">
-          <div className="p-6">
-            <h2 className="text-2xl font-bold mb-4">Raids</h2>
-            <p className="text-muted-foreground">Coming soon...</p>
           </div>
         </TabsContent>
       </Tabs>
-
-      <div style={{ position: "absolute", height: "100px" }} ref={bottomOfTable} />
-
-
-      {totalValue > 0 && (
-        <div className="total-footer">
-          <div className="total-gold-container">
-            {floatingValues.map(({ id, value, isPositive }) => (
-              <div
-                key={id}
-                className={`floating-value ${isPositive ? 'positive' : 'negative'}`}
-              >
-                {isPositive ? '+' : '-'} {getDisplayValue(value)} gold
-              </div>
-            ))}
-            <span className="total-gold-label">Total Gold:</span>
-            <span className="total-gold-value">
-              {getDisplayValue(totalValue)} gold
-            </span>
-          </div>
-        </div>
-      )}
-      <ItemCreateModal
-        open={isCreateModalOpen}
-        name={searchQuery.trim().charAt(0).toUpperCase() + searchQuery.trim().slice(1)}
-        onClose={() => setIsCreateModalOpen(false)}
-        onCreated={handleCreatedCustomItem}
-      />
     </div>
   );
 }
 
-export default App; 
+export default App;

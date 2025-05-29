@@ -12,7 +12,8 @@
     "scrape-items-and-images": "node scripts/scrapeItems.js",
     "scrape-items": "node scripts/scrapeItems.js --skip-images",
     "scrape-some-raids": "node scripts/scrapeRaids.js --limit=10",
-    "scrape-raids": "node scripts/scrapeRaids.js"
+    "scrape-raids": "node scripts/scrapeRaids.js",
+    "scrape-mobs": "node scripts/scrapeMobs.js"
   },
   "keywords": [
     "react",

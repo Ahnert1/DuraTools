@@ -10,7 +10,7 @@ const args = process.argv.slice(2);
 const skipImages = args.includes('--skip-images');
 
 // Path to the local HTML file
-const LOCAL_HTML_PATH = path.join(__dirname, '../src/data/htmlItemsToScrape.html');
+const LOCAL_HTML_PATH = path.join(__dirname, '../scripts/htmlItemsToScrape.html');
 
 const getItemCategory = (itemName) => {
   const name = itemName.toLowerCase();
@@ -187,8 +187,14 @@ const extractItemData = async (html) => {
       let itemName = nameCell.text().trim();
       // Try to get the name from the link title if available
       const nameLink = nameCell.find('a[title]');
+      let wikiHref = null;
       if (nameLink.length) {
         itemName = nameLink.attr('title').trim();
+        // Get the href from the link
+        const href = nameLink.attr('href');
+        if (href) {
+          wikiHref = href.startsWith('//') ? 'https:' + href : href;
+        }
       }
       // Remove "(page does not exist)" from item name
       itemName = itemName.replace(/\s*\(page does not exist\)\s*/, '');
@@ -261,6 +267,7 @@ const extractItemData = async (html) => {
         npcNames: Array.from(maxNpcs).filter(npc => npc.length > 0),
         imageBase64,
         category,
+        wikiHref,
         _imageData: !skipImages && imageUrl ? {
           url: imageUrl.startsWith('//') ? 'https:' + imageUrl : imageUrl,
           filename: imageFilename
@@ -324,6 +331,7 @@ const generateTypeScriptFile = (items) => {
   value: number;
   imageBase64?: string; // Optional base64 for item image
   category?: string;
+  wikiHref?: string; // Link to the item's wiki page
 }
 
 // Data scraped from Dura Wiki tables
@@ -333,7 +341,8 @@ export const lootItems: ItemData[] = [
   for (const item of items) {
     const npcsString = item.npcNames.map(npc => `"${npc}"`).join(', ');
     const imageBase64String = item.imageBase64 ? `, imageBase64: \`${item.imageBase64}\`` : '';
-    tsContent += `  { name: "${item.name}", npcNames: [${npcsString}], value: ${item.value}, category: "${item.category}"${imageBase64String} },\n`;
+    const wikiHrefString = item.wikiHref ? `, wikiHref: "${item.wikiHref}"` : '';
+    tsContent += `  { name: "${item.name}", npcNames: [${npcsString}], value: ${item.value}, category: "${item.category}"${imageBase64String}${wikiHrefString} },\n`;
   }
 
   tsContent += '];';
