@@ -1091,18 +1091,19 @@ button:disabled {
 }
 
 .mob-tooltip div {
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   padding: 3px 0;
   white-space: normal;
 }
 
-.mob-tooltip div:last-child {
-  border-bottom: none;
-}
 
 @media (prefers-color-scheme: dark) {
   .mob-tooltip {
     background-color: #1a1a1a;
     border: 1px solid #333;
   }
+}
+
+.unmatched-lines-message{
+  max-height: 2f00px;
+  overflow-y: auto;
 }

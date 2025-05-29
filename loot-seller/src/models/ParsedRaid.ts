@@ -1,6 +1,6 @@
 export interface ParsedRaid {
     name: string;
     mobs: string[];
-    elapsedTime: string;
+    elapsedTime: number;
     location: string;
 }

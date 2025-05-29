@@ -486,9 +486,6 @@ function App() {
 
       // Find matching raid
       const matchingRaid = raidData.find(raid => {
-        if (raid.firstMessage.includes("It is mating season for the spiders of the plains. Their numbers are about to multiply... beware")) {
-          debugger;
-        }
         const messages = [
           raid.firstMessage,
           raid.bossMessage
@@ -503,7 +500,7 @@ function App() {
         raids.push({
           name: matchingRaid.name,
           mobs: matchingRaid.mobs,
-          elapsedTime: elapsedTime ? `${elapsedTime} minutes ago` : '',
+          elapsedTime: elapsedTime ? parseInt(elapsedTime) : 0,
           location: matchingRaid.location
         });
       } else {
@@ -536,8 +533,8 @@ function App() {
   const getSortedRaids = useMemo(() => {
     if (raidViewMode === 'time') {
       return [...parsedRaids].sort((a, b) => {
-        const timeA = parseInt(a.elapsedTime) || 0;
-        const timeB = parseInt(b.elapsedTime) || 0;
+        const timeA = a.elapsedTime || 0;
+        const timeB = b.elapsedTime || 0;
         return timeA - timeB;
       });
     } else {
@@ -556,18 +553,13 @@ function App() {
         .map(([location, raids]) => ({
           location,
           raids: raids.sort((a, b) => {
-            const timeA = parseInt(a.elapsedTime) || 0;
-            const timeB = parseInt(b.elapsedTime) || 0;
+            const timeA = a.elapsedTime || 0;
+            const timeB = b.elapsedTime || 0;
             return timeA - timeB;
           })
         }));
     }
   }, [parsedRaids, raidViewMode]) as ParsedRaid[] | { location: string; raids: ParsedRaid[] }[];
-
-  // Type guard to check if a raid is a ParsedRaid
-  const isParsedRaid = (raid: ParsedRaid | { location: string; raids: ParsedRaid[] }): raid is ParsedRaid => {
-    return 'name' in raid && 'mobs' in raid && 'elapsedTime' in raid;
-  };
 
   // Update the view mode handler to save to local storage
   const handleViewModeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -664,7 +656,7 @@ function App() {
                       <th>Raid Name</th>
                       <th>Mobs</th>
                       {raidViewMode != 'location' && <th>Location</th>}
-                      <th>Time</th>
+                      <th style={{ minWidth: "250px", textAlign: "center" }}>Time</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -681,7 +673,9 @@ function App() {
                             </div>
                           </td>
                           <td>{raid.location}</td>
-                          <td>{raid.elapsedTime || "Now"}</td>
+                          <td>{raid.elapsedTime ? (raid.elapsedTime > 60
+                            ? `${Math.floor(raid.elapsedTime / 60)} hours and ${raid.elapsedTime % 60} minutes ago`
+                            : `${raid.elapsedTime} minutes ago`) : 'Now'}</td>
                         </tr>
                       ))
                     ) : (
@@ -703,7 +697,8 @@ function App() {
                                   ))}
                                 </div>
                               </td>
-                              <td>{raid.elapsedTime}</td>
+                              <td>{raid.location}</td>
+                              <td>{raid.elapsedTime ? `${raid.elapsedTime} minutes ago` : "Now"}</td>
                             </tr>
                           ))}
                         </React.Fragment>

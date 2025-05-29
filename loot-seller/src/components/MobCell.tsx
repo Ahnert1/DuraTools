@@ -78,7 +78,7 @@ export default function MobCell({ mobName }: MobCellProps) {
                                 {mob.notableLoot.map((lootName: string, index: number) => {
                                     const item = lootItems.find(item => item.name === lootName);
                                     return (
-                                        <div key={index} className="flex items-center gap-1">
+                                        <div key={index} className="border-b border-gray-300 border-opacity-10 flex items-center gap-1">
                                             <a
                                                 target="_blank"
                                                 rel="noopener noreferrer"
