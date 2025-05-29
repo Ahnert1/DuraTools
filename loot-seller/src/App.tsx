@@ -15,6 +15,7 @@ import { ParsedRaid } from './models/ParsedRaid';
 import MobCell from './components/MobCell';
 import { mobData } from './data/mobData';
 import { ItemCreateModal } from './components/item-create-modal';
+import { RaidTooltip } from './components/RaidTooltip';
 
 function App() {
   // State for form fields
@@ -664,7 +665,9 @@ function App() {
                       // Time-based view
                       (getSortedRaids as ParsedRaid[]).map((raid: ParsedRaid, index: number) => (
                         <tr key={index}>
-                          <td>{raid.name}</td>
+                          <td>
+                            <RaidTooltip raidName={raid.name} />
+                          </td>
                           <td>
                             <div className="flex flex-wrap gap-4">
                               {raid.mobs.map((mobName: string, mobIndex: number) => (
@@ -689,7 +692,9 @@ function App() {
                           </tr>
                           {raids.map((raid: ParsedRaid, index: number) => (
                             <tr key={`${location}-${index}`}>
-                              <td>{raid.name}</td>
+                              <td>
+                                <RaidTooltip raidName={raid.name} />
+                              </td>
                               <td>
                                 <div className="flex flex-wrap gap-4">
                                   {raid.mobs.map((mobName: string, mobIndex: number) => (
@@ -697,8 +702,10 @@ function App() {
                                   ))}
                                 </div>
                               </td>
-                              <td>{raid.location}</td>
-                              <td>{raid.elapsedTime ? `${raid.elapsedTime} minutes ago` : "Now"}</td>
+                              {raidViewMode != 'location' && <td>{raid.location}</td>}
+                              <td>{raid.elapsedTime ? (raid.elapsedTime > 60
+                                ? `${Math.floor(raid.elapsedTime / 60)} hours and ${raid.elapsedTime % 60} minutes ago`
+                                : `${raid.elapsedTime} minutes ago`) : 'Now'}</td>
                             </tr>
                           ))}
                         </React.Fragment>

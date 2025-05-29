@@ -747,6 +747,7 @@ button:disabled {
 .tooltip-container {
   position: relative;
   display: inline-block;
+  cursor: help;
 }
 
 .tooltip {
@@ -1104,6 +1105,73 @@ button:disabled {
 }
 
 .unmatched-lines-message{
-  max-height: 2f00px;
+  max-height: 200px;
   overflow-y: auto;
+}
+
+/* Raid tooltip specific styles */
+.raid-tooltip {
+  background-color: #333;
+  min-width: 400px;
+  max-width: 600px;
+  white-space: normal;
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: 4px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  position: absolute;
+  z-index: 1000;
+}
+
+.raid-tooltip.tooltip-top {
+  bottom: calc(100% - 4px);
+  top: auto;
+}
+
+.raid-tooltip.tooltip-bottom {
+  top: 100%;
+  bottom: auto;
+}
+
+.raid-tooltip .tooltip-content {
+  width: 100%;
+  background-color: #333;
+  color: #fff;
+  border: none;
+  box-shadow: none;
+}
+
+.raid-tooltip .tooltip-item {
+  padding: 8px 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+.raid-tooltip .tooltip-item:last-child {
+  border-bottom: none;
+}
+
+.raid-tooltip .tooltip-item strong {
+  display: block;
+  margin-bottom: 4px;
+  color: #4CAF50;
+}
+
+@media (prefers-color-scheme: dark) {
+  .raid-tooltip {
+    background-color: #1a1a1a;
+    border: 1px solid #333;
+  }
+  
+  .raid-tooltip .tooltip-content {
+    background-color: #1a1a1a;
+  }
+  
+  .raid-tooltip .tooltip-item {
+    border-bottom-color: rgba(255, 255, 255, 0.1);
+  }
+  
+  .raid-tooltip .tooltip-item strong {
+    color: #66bb6a;
+  }
 }
