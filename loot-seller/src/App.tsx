@@ -14,6 +14,7 @@ import { raidData } from './data/raidData';
 import { ParsedRaid } from './models/ParsedRaid';
 import MobCell from './components/MobCell';
 import { mobData } from './data/mobData';
+import { ItemCreateModal } from './components/item-create-modal';
 
 function App() {
   // State for form fields
@@ -935,6 +936,33 @@ function App() {
           </div>
         </TabsContent>
       </Tabs>
+      <div style={{ position: "absolute", height: "100px" }} ref={bottomOfTable} />
+
+
+      {totalValue > 0 && (
+        <div className="total-footer">
+          <div className="total-gold-container">
+            {floatingValues.map(({ id, value, isPositive }) => (
+              <div
+                key={id}
+                className={`floating-value ${isPositive ? 'positive' : 'negative'}`}
+              >
+                {isPositive ? '+' : '-'} {getDisplayValue(value)} gold
+              </div>
+            ))}
+            <span className="total-gold-label">Total Gold:</span>
+            <span className="total-gold-value">
+              {getDisplayValue(totalValue)} gold
+            </span>
+          </div>
+        </div>
+      )}
+      <ItemCreateModal
+        open={isCreateModalOpen}
+        name={searchQuery.trim().charAt(0).toUpperCase() + searchQuery.trim().slice(1)}
+        onClose={() => setIsCreateModalOpen(false)}
+        onCreated={handleCreatedCustomItem}
+      />
     </div>
   );
 }
