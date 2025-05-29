@@ -45,7 +45,10 @@ function App() {
   // Add these state variables in the App component
   const [raidLogInput, setRaidLogInput] = useState('');
   const [parsedRaids, setParsedRaids] = useState<ParsedRaid[]>([]);
-  const [raidViewMode, setRaidViewMode] = useState<'time' | 'location'>('time');
+  const [raidViewMode, setRaidViewMode] = useState<'time' | 'location'>(() => {
+    const savedMode = localStorage.getItem('raidViewMode');
+    return (savedMode === 'time' || savedMode === 'location') ? savedMode : 'time';
+  });
 
   useEffect(() => {
     setCustomItems(getCustomItems())
@@ -529,6 +532,13 @@ function App() {
     return 'name' in raid && 'mobs' in raid && 'elapsedTime' in raid;
   };
 
+  // Update the view mode handler to save to local storage
+  const handleViewModeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const newMode = e.target.value as 'time' | 'location';
+    setRaidViewMode(newMode);
+    localStorage.setItem('raidViewMode', newMode);
+  };
+
   return (
     <div className="container">
       <div className="header-collage-mobile">
@@ -574,7 +584,7 @@ function App() {
                   <select
                     id="view-mode"
                     value={raidViewMode}
-                    onChange={(e) => setRaidViewMode(e.target.value as 'time' | 'location')}
+                    onChange={handleViewModeChange}
                     className="category-select"
                   >
                     <option value="time">Sort by Time</option>

@@ -4,6 +4,13 @@ import { handleImageError } from "../utils/imageUtils";
 import placeholderBase64 from "../utils/placeholder-base64";
 import { useRef, useEffect, useState } from "react";
 
+const elementColors: Record<string, string> = {
+    Fire: 'text-red-500',
+    Ice: 'text-sky-400',
+    Terra: 'text-green-500',
+    Energy: 'text-blue-700'
+};
+
 // Add new MobCell component
 interface MobCellProps {
     mobName: string;
@@ -55,7 +62,14 @@ export default function MobCell({ mobName }: MobCellProps) {
                     <div><strong>Glory:</strong> Lvl {mob.gloryLvl}</div>
                     <div><strong>Over Experienced:</strong> Lvl {mob.overExperiencedLvl}</div>
                     {mob.elementWeaknesses.length > 0 && (
-                        <div><strong>Weaknesses:</strong> {mob.elementWeaknesses.join(', ')}</div>
+                        <div>
+                            <strong>Weaknesses:</strong>{' '}
+                            {mob.elementWeaknesses.map((element, index) => (
+                                <span key={index} className={elementColors[element] || ''}>
+                                    {element}{index < mob.elementWeaknesses.length - 1 ? ', ' : ''}
+                                </span>
+                            ))}
+                        </div>
                     )}
                     {mob.notableLoot.length > 0 && (
                         <div>
