@@ -1,5 +1,5 @@
 // This file is auto-generated. Do not edit manually.
-// Generated on: 2025-05-27T03:46:53.026Z
+// Generated on: 2025-05-29T18:01:58.648Z
 
 export interface Raid {
   href: string;
@@ -1123,7 +1123,7 @@ export const raidData: Raid[] = [
     "thirdMessage": "The pharaohs of Khepresh see their workers' task list grow longer every day... They order the viziers to reanimate the slaves who perished aeons ago to raise the laborers in number.",
     "bossMessage": "",
     "name": "Khepresh Pharaohs",
-    "location": "Khepresh",
+    "location": "Khepresh(Library, Map Room)",
     "mobs": [
       "Pharaoh",
       "Crawling Hand"
@@ -1142,11 +1142,12 @@ export const raidData: Raid[] = [
     "thirdMessage": "",
     "bossMessage": "",
     "name": "Khepresh Forty Thieves",
-    "location": "Khepresh",
+    "location": "Khepresh(Library, High Priest's Wing, Map Room)",
     "mobs": [
       "One of the Forty",
       "Bedouin",
-      "Bedouin Wife"
+      "Bedouin Wife",
+      "Dreadseer"
     ],
     "bosses": [],
     "floors": [
@@ -1163,13 +1164,32 @@ export const raidData: Raid[] = [
     "thirdMessage": "",
     "bossMessage": "",
     "name": "Khepresh Tar Oozes",
-    "location": "Khepresh Riverside",
+    "location": "Khepresh(Riverside - Tar Ooze Spawn)",
     "mobs": [
       "Tar Ooze"
     ],
     "bosses": [],
     "floors": [
       "-7"
+    ],
+    "timeToSpawn": "?"
+  },
+  {
+    "href": "/view/durawiki/raids/ankrahmun-raids/khepresh-tortured-souls",
+    "firstMessage": "Tortured souls cannot escape the Kepresh even in death.. Centuries of burning and branding imbue the sands and soil with an energy of pure vengeance.",
+    "secondMessage": "",
+    "thirdMessage": "",
+    "bossMessage": "",
+    "name": "Khepresh Tortured Souls",
+    "location": "Khepresh(Torture Room)",
+    "mobs": [
+      "Crawling Hand",
+      "Demon"
+    ],
+    "bosses": [],
+    "floors": [
+      "-7",
+      "-8"
     ],
     "timeToSpawn": "?"
   },
@@ -3364,8 +3384,8 @@ export const raidData: Raid[] = [
   },
   {
     "href": "/view/durawiki/raids/thais-raids/mintwallin-heros",
-    "firstMessage": "Tales of Soohan's beauty have been shared throughout the ranks of men... They travel en masse to the islandwalks past Mintwallin in search of this fabled woman.",
-    "secondMessage": "The suitors are too late... She has left these lands and with her absence the men turn forlorn and lonely.. Dark effeminate spirits come from across the ghostly lake seeking to rob them of their warmth.",
+    "firstMessage": "Tales of Soohan's beauty have been shared throughout the ranks of men... They travel en masse to the islandwalks past Mintwallin in search of this fabled woman.",
+    "secondMessage": "The suitors are too late... She has left these lands and with her absence the men turn forlorn and lonely.. dark womanly spirits come from across the ghostly lake seeking to rob them of their warmth.",
     "thirdMessage": "",
     "bossMessage": "",
     "name": "Mintwallin Heros",

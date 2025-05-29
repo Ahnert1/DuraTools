@@ -249,10 +249,67 @@ async function scrapeRaids(limit) {
 }
 
 /**
+ * Manual overrides for specific raid properties
+ * Format: { href: { propertyName: newValue } }
+ */
+const raidOverrides = {
+    // Example: Override firstMessage for a specific raid
+    '/view/durawiki/raids/thais-raids/mintwallin-heros': {
+        firstMessage: 'Tales of Soohan\'s beauty have been shared throughout the ranks of men... They travel en masse to the islandwalks past Mintwallin in search of this fabled woman.',
+        secondMessage: 'The suitors are too late... She has left these lands and with her absence the men turn forlorn and lonely.. dark womanly spirits come from across the ghostly lake seeking to rob them of their warmth.'
+    }
+};
+
+/**
+ * Custom raids to be added to the final output
+ * These will be merged with scraped raids
+ */
+const customRaids = [
+    // {
+    //     href: '/view/durawiki/raids/custom-raid',
+    //     name: 'Custom Raid Name',
+    //     firstMessage: 'Custom first message',
+    //     secondMessage: 'Custom second message',
+    //     thirdMessage: 'Custom third message',
+    //     bossMessage: 'Custom boss message',
+    //     location: 'Custom location',
+    //     mobs: ['Custom Mob 1', 'Custom Mob 2'],
+    //     bosses: ['Custom Boss'],
+    //     floors: ['1', '2'],
+    //     timeToSpawn: 'Custom spawn time'
+    // }
+];
+
+/**
+ * Applies manual overrides and adds custom raids to the raid data
+ * @param {Map<string, Raid>} raids - Map of href to Raid object
+ * @returns {Map<string, Raid>} Updated raid data
+ */
+function applyManualAdjustments(raids) {
+    // Apply overrides
+    for (const [href, overrides] of Object.entries(raidOverrides)) {
+        if (raids.has(href)) {
+            const raid = raids.get(href);
+            raids.set(href, { ...raid, ...overrides });
+        }
+    }
+
+    // Add custom raids
+    for (const customRaid of customRaids) {
+        raids.set(customRaid.href, customRaid);
+    }
+
+    return raids;
+}
+
+/**
  * Saves raid data to a TypeScript file
  * @param {Map<string, Raid>} raids - Map of href to Raid object
  */
 function saveRaidsToFile(raids) {
+    // Apply manual adjustments before saving
+    raids = applyManualAdjustments(raids);
+
     const outputPath = path.join(__dirname, '../src/data/raidData.ts');
 
     // Convert Map to array of objects for easier TypeScript typing
