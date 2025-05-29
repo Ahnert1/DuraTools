@@ -13,6 +13,7 @@ import { Textarea } from "./@/components/ui/textarea";
 import { raidData } from './data/raidData';
 import { ParsedRaid } from './models/ParsedRaid';
 import MobCell from './components/MobCell';
+import { mobData } from './data/mobData';
 
 function App() {
   // State for form fields
@@ -49,6 +50,22 @@ function App() {
     const savedMode = localStorage.getItem('raidViewMode');
     return (savedMode === 'time' || savedMode === 'location') ? savedMode : 'time';
   });
+  const [unmatchedLines, setUnmatchedLines] = useState<string[]>([]);
+
+  // Add new function to get random mob/item
+  const getRandomMob = useCallback(() => {
+    const randomIndex = Math.floor(Math.random() * mobData.length);
+    return mobData[randomIndex];
+  }, []);
+
+  const getRandomItem = useCallback(() => {
+    const randomIndex = Math.floor(Math.random() * lootItems.length);
+    return lootItems[randomIndex];
+  }, []);
+
+  // Add state for random mob/item
+  const [randomMob] = useState(getRandomMob);
+  const [randomItem] = useState(getRandomItem);
 
   useEffect(() => {
     setCustomItems(getCustomItems())
@@ -453,6 +470,7 @@ function App() {
   const parseRaidLog = (input: string) => {
     const lines = input.split('\n').filter(line => line.trim());
     const raids: ParsedRaid[] = [];
+    const unmatchedLines: string[] = [];
 
     lines.forEach(line => {
       // Extract elapsed time
@@ -467,6 +485,9 @@ function App() {
 
       // Find matching raid
       const matchingRaid = raidData.find(raid => {
+        if (raid.firstMessage.includes("It is mating season for the spiders of the plains. Their numbers are about to multiply... beware")) {
+          debugger;
+        }
         const messages = [
           raid.firstMessage,
           raid.bossMessage
@@ -484,10 +505,25 @@ function App() {
           elapsedTime: elapsedTime ? `${elapsedTime} minutes ago` : '',
           location: matchingRaid.location
         });
+      } else {
+        // Check if no second/third message match, and report errors
+        const matchingRaid = raidData.find(raid => {
+          const messages = [
+            raid.secondMessage,
+            raid.thirdMessage
+          ].filter(Boolean);
+          return messages.some(message =>
+            cleanLine.toLowerCase().includes(message.toLowerCase())
+          );
+        });
+        if (!matchingRaid) {
+          unmatchedLines.push(cleanLine);
+        }
       }
     });
 
     setParsedRaids(raids);
+    setUnmatchedLines(unmatchedLines);
   };
 
   // Add this effect in the App component
@@ -547,8 +583,24 @@ function App() {
       <Tabs defaultValue="raids" onValueChange={handleTabChange}>
         <div className="tabs-container">
           <TabsList className="flex gap-10">
-            <TabsTrigger value="raids">Raids</TabsTrigger>
-            <TabsTrigger value="calculator">Calculator</TabsTrigger>
+            <TabsTrigger value="raids" className="flex items-center gap-2">
+              <img
+                src={randomMob.imageBase64 || placeholderBase64}
+                alt={randomMob.name}
+                className="w-6 h-6 object-contain"
+                onError={handleImageError}
+              />
+              Raids
+            </TabsTrigger>
+            <TabsTrigger value="calculator" className="flex items-center gap-2">
+              <img
+                src={randomItem.imageBase64 || placeholderBase64}
+                alt={randomItem.name}
+                className="w-6 h-6 object-contain"
+                onError={handleImageError}
+              />
+              Calculator
+            </TabsTrigger>
           </TabsList>
         </div>
         <TabsContent value="raids">
@@ -591,6 +643,16 @@ function App() {
                     <option value="location">Group by Location</option>
                   </select>
                 </div>
+                {unmatchedLines.length > 0 && (
+                  <div className="unmatched-lines-message">
+                    {unmatchedLines.length} lines not matched:
+                    <ul>
+                      {unmatchedLines.map((line, index) => (
+                        <li key={index}>{line}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
               </div>
             </div>
             <div style={{ width: '100%' }}>
@@ -618,7 +680,7 @@ function App() {
                             </div>
                           </td>
                           <td>{raid.location}</td>
-                          <td>{raid.elapsedTime}</td>
+                          <td>{raid.elapsedTime || "Now"}</td>
                         </tr>
                       ))
                     ) : (
@@ -650,9 +712,10 @@ function App() {
                 </table>
                 {parsedRaids.length === 0 && (
                   <div className="no-items-message">
-                    {"<--"} Paste your entire raid log for analysis
+                    Paste your entire raid log for analysis
                   </div>
                 )}
+
               </div>
             </div>
           </div>
@@ -749,27 +812,125 @@ function App() {
                             >
                               <div
                                 className="item-bg"
-                                style={{ backgroundImage: `url(${item.imageBase64 || placeholderBase64})` }}
-                              ></div>
+                                style={{ backgroundImage: `url('${item.imageBase64 || placeholderBase64}')` }}
+                              />
                               <div className="item-content">
+                                <div className="item-value">{getDisplayValue(item.value)} gp</div>
                                 <div className="item-name">{item.name}</div>
-                                <div className="item-details">
-                                  <span className="gold-text">{getDisplayValue(item.value)} gp</span>
-                                  <span className={`npc-indicator ${item.category === "New Custom" ? 'new-custom' : ''}`}>
-                                    {item.npcNames.length > 1
-                                      ? ` ${item.npcNames.length} NPCs`
-                                      : ` ${item.npcNames[0]}`}
-                                  </span>
-                                </div>
                               </div>
                             </div>
                           ))
+                        )}
+                        {filteredItems.length > 0 && (
+                          <div className="search-results-footer">
+                            Showing {searchResults.length} {searchResults.length == 1 ? "item" : "items"}{searchQuery.trim() ? " matching your search" : " in this category"}.
+                          </div>
                         )}
                       </div>
                     )}
                   </div>
                 </div>
+
+                <div className="form-group">
+                  <label htmlFor="quantity">Quantity</label>
+                  <input
+                    id="quantity"
+                    type="number"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                    min="0"
+                    placeholder="1"
+                    autoComplete='off'
+                    max="9999"
+                    value={quantity ?? ''}
+                    onChange={handleQuantityChange}
+                    onKeyPress={handleQuantityKeyPress}
+                    ref={quantityInputRef}
+                  />
+                </div>
+
+                <button type="submit" disabled={!selectedItem}>
+                  <p style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.5rem' }}>
+                    Add {selectedItem ? `${quantity ?? 1}x` : ''} {selectedItem?.name ?? 'Item'} {selectedItem && <img src={selectedItem.imageBase64 || placeholderBase64} alt={selectedItem.name} className="item-image" onError={handleImageError} />}
+                  </p>
+                </button>
               </form>
+            </div>
+            <div style={{ width: '100%' }}>
+
+              <div className="inventory-section">
+                <table className="item-table">
+                  <thead >
+                    <tr>
+                      <th style={{ width: '40px' }}></th>
+                      <th>Item Name</th>
+                      <th>Quantity</th>
+                      <th>Value</th>
+                      <th>NPC(s)</th>
+                      <th>Delete</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {tableEntries.map((entry) => (
+                      <tr key={entry.id}>
+                        <td>
+                          <img
+                            src={entry.imageBase64 || placeholderBase64}
+                            alt={entry.name}
+                            className="table-item-image"
+                            onError={handleImageError}
+                          />
+                        </td>
+                        <td>{entry.name}</td>
+
+                        <td>
+                          <input
+                            type="number"
+                            min="0"
+                            max="9999"
+                            value={entry.quantity}
+                            onChange={(e) => handleUpdateQuantity(entry.id ?? '', parseInt(e.target.value, 10) || 1)}
+                            className={`quantity-input ${lastUpdatedItemName === entry.name ? (isQuantityDecreasing ? 'highlight-update-decrease' : 'highlight-update') : ''}`}
+                          />
+                        </td>
+                        <td style={{ minWidth: '140px', maxWidth: '140px', verticalAlign: 'middle', padding: '0px 0px 0px 10px' }}>
+                          <div style={{ minHeight: "70px", display: 'flex', alignItems: 'center' }}>
+                            @
+                            <span className="gold-text">{(entry.value / (entry.quantity ?? 1)) > 1000 ? `${(entry.value / (entry.quantity ?? 1)) / 1000}k` : (entry.value / (entry.quantity ?? 1))} = </span>
+                            <span className={`calculated-item-total ${lastUpdatedItemName === entry.name ? (isQuantityDecreasing ? 'less-gold-animation' : 'more-gold-animation') : ''}`}>&nbsp;{getDisplayValue(entry.value)}</span>
+                          </div>
+                        </td>
+                        <td style={{ textAlign: 'center', width: '40px' }}>
+                          {entry.category !== CATEGORIES.CUSTOM && <div className="tooltip-container">
+                            <span className="npc-count">&#9432;</span>
+                            < div className="tooltip">
+                              <div className="tooltip-content">
+                                {entry.npcNames.map((npc) => (
+                                  <span key={npc} className={`tooltip-item ${getNpcColor(npc)}`}>{npc}</span>
+                                ))}
+                              </div>
+                            </div>
+                          </div>}
+                        </td>
+                        <td>
+                          <button
+                            onClick={() => handleDeleteItem(entry.name ?? '')}
+                            className="delete-button"
+                            title="Remove entry"
+                          >
+                            ✕
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                {tableEntries.length == 0 && (
+                  <div className="no-items-message">
+                    Add your loot to view it here
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </TabsContent>

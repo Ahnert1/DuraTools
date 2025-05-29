@@ -6,9 +6,9 @@ import { useRef, useEffect, useState } from "react";
 
 const elementColors: Record<string, string> = {
     Fire: 'text-red-500',
-    Ice: 'text-sky-400',
+    Ice: 'text-sky-500',
     Terra: 'text-green-500',
-    Energy: 'text-blue-700'
+    Energy: 'text-purple-500'
 };
 
 // Add new MobCell component

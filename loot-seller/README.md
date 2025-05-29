@@ -1,4 +1,4 @@
-# Dura Profit Calculator
+# Dura Tools
 
 A React application for searching and managing loot items from the Dura game wiki.
 
