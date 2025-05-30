@@ -577,23 +577,28 @@ function App() {
       <Tabs defaultValue="raids" onValueChange={handleTabChange}>
         <div className="tabs-container">
           <TabsList className="flex gap-10">
-            <TabsTrigger value="raids" className="flex items-center gap-2">
-              <img
-                src={randomMob.imageBase64 || placeholderBase64}
-                alt={randomMob.name}
-                className="w-6 h-6 object-contain"
-                onError={handleImageError}
-              />
-              Raids
+            <TabsTrigger value="raids" className={`flex items-center gap-2 `}>
+              <div className={`flex items-center gap-2 ${activeTab === 'raids' ? 'selected-tab' : ''}`}>
+                <img
+                  src={randomMob.imageBase64 || placeholderBase64}
+                  alt={randomMob.name}
+                  className="w-6 h-6 object-contain"
+                  onError={handleImageError}
+                />
+                Raids
+              </div>
             </TabsTrigger>
-            <TabsTrigger value="calculator" className="flex items-center gap-2">
-              <img
-                src={randomItem.imageBase64 || placeholderBase64}
-                alt={randomItem.name}
-                className="w-6 h-6 object-contain"
-                onError={handleImageError}
-              />
-              Calculator
+            <div style={{ width: '80%' }} />
+            <TabsTrigger value="calculator" className={`flex items-center gap-2`}>
+              <div className={`flex items-center gap-2 ${activeTab === 'calculator' ? 'selected-tab' : ''}`}>
+                <img
+                  src={randomItem.imageBase64 || placeholderBase64}
+                  alt={randomItem.name}
+                  className="w-6 h-6 object-contain"
+                  onError={handleImageError}
+                />
+                Calculator
+              </div>
             </TabsTrigger>
           </TabsList>
         </div>
@@ -608,7 +613,7 @@ function App() {
                     placeholder="Paste your raid log here..."
                     value={raidLogInput}
                     onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setRaidLogInput(e.target.value)}
-                    className="min-h-[400px]"
+                    className="min-h-[100px]"
                   />
                   <button
                     type="button"

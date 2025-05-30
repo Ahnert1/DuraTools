@@ -257,6 +257,9 @@ const raidOverrides = {
     '/view/durawiki/raids/thais-raids/mintwallin-heros': {
         firstMessage: 'Tales of Soohan\'s beauty have been shared throughout the ranks of men... They travel en masse to the islandwalks past Mintwallin in search of this fabled woman.',
         secondMessage: 'The suitors are too late... She has left these lands and with her absence the men turn forlorn and lonely.. dark womanly spirits come from across the ghostly lake seeking to rob them of their warmth.'
+    },
+    '/view/durawiki/raids/edron-raids/edron-orcs-worship': {
+        secondMessage: 'Her wretched eggs burst! Longlegged horrors spill outward... The infestation has begun!'
     }
 };
 

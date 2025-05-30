@@ -105,10 +105,11 @@ export function HeaderCollage({ activeTab }: HeaderCollageProps) {
         <div className="header-collage">
             <div className="header-collage-text">
                 <h1>{sourceConfig.title}</h1><br />
-                {sourceConfig.text} <a href={sourceConfig.url} target="_blank" rel="noopener noreferrer">{sourceConfig.url}</a>
+                {sourceConfig.text}<br />
+                <a href={sourceConfig.url} target="_blank" rel="noopener noreferrer">{sourceConfig.url}</a>
                 <span className="item-count"> ({sourceConfig.count} {activeTab === "raids" ? "raids" : "items"} in database)</span>
                 <br />
-                Tips appreciated <a href="https://discordapp.com/users/ahnert">Godlike</a> {"/ Thais ;)"} <br />
+                Made by <a style={{ color: 'green' }} href="https://discordapp.com/users/ahnert">Godlike</a><br />
             </div>
             {items.map((item) => (
                 <div

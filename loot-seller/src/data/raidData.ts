@@ -1,5 +1,5 @@
 // This file is auto-generated. Do not edit manually.
-// Generated on: 2025-05-29T18:01:58.648Z
+// Generated on: 2025-05-30T15:48:39.213Z
 
 export interface Raid {
   href: string;
@@ -1951,7 +1951,7 @@ export const raidData: Raid[] = [
   {
     "href": "/view/durawiki/raids/edron-raids/edron-orcs-worship",
     "firstMessage": "The orcs of Edron gather to worship the eggs of their benevolent arachnid matriarch.",
-    "secondMessage": "Her wretched eggs burst! Longlegged horros spill outward... The infestation has begun!",
+    "secondMessage": "Her wretched eggs burst! Longlegged horrors spill outward... The infestation has begun!",
     "thirdMessage": "",
     "bossMessage": "",
     "name": "Edron Orcs Worship",
