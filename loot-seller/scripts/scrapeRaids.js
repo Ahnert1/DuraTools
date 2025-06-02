@@ -270,6 +270,12 @@ const raidOverrides = {
     },
     "/view/durawiki/raids/abdendriel-raids/dwarven-underground-tunnels": {
         firstMessage: "WALLACE: DWARVES HAVE BEEN BUILDING SECRET UNDERGROUND TUNNELS UKNOWNST TO ALL! THEY MOVE NOW AFTER THE TREASURE OF THE AB'DENDRIEL ELVES!"
+    },
+    "/view/durawiki/raids/venore-raids/wolves-come-out": {
+        firstMessage: "WALLACE: WOLVES COME OUT OF THE FOREST TO THE PLAINS!",
+    },
+    "/view/durawiki/raids/kazordoon-raids/army-of-orcs": {
+        firstMessage: "An army of orcs cut across the midlands. Orcs don't go round hills, they go through them!"
     }
 };
 

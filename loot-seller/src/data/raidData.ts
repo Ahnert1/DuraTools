@@ -1,5 +1,5 @@
 // This file is auto-generated. Do not edit manually.
-// Generated on: 2025-06-02T05:10:55.502Z
+// Generated on: 2025-06-02T13:09:21.813Z
 
 export interface Raid {
   href: string;
@@ -2373,7 +2373,7 @@ export const raidData: Raid[] = [
   },
   {
     "href": "/view/durawiki/raids/kazordoon-raids/army-of-orcs",
-    "firstMessage": "An army of Orcs cut across midlands, orcs don't go round hills, they go through them!",
+    "firstMessage": "An army of orcs cut across the midlands. Orcs don't go round hills, they go through them!",
     "secondMessage": "",
     "thirdMessage": "",
     "bossMessage": "",
@@ -4397,7 +4397,7 @@ export const raidData: Raid[] = [
   },
   {
     "href": "/view/durawiki/raids/venore-raids/wolves-come-out",
-    "firstMessage": "WALLACE: WOLVES COMES OUT OF THE FOREST TO THE PLAINS!",
+    "firstMessage": "WALLACE: WOLVES COME OUT OF THE FOREST TO THE PLAINS!",
     "secondMessage": "",
     "thirdMessage": "",
     "bossMessage": "",
