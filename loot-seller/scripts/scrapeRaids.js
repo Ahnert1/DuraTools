@@ -260,6 +260,16 @@ const raidOverrides = {
     },
     '/view/durawiki/raids/edron-raids/edron-orcs-worship': {
         secondMessage: 'Her wretched eggs burst! Longlegged horrors spill outward... The infestation has begun!'
+    },
+    "/view/durawiki/raids/thais-raids/fibula-dragon-lords": {
+        firstMessage: 'The Dragons of Fibula are stirred from their slumbers by the hammers of the day and revelries of night, the minotaurs flee...',
+        secondMessage: "The noise of shields only rankles them further.",
+        bossMessage: `A lord of the dragon tears out of the earth....
+        or
+        A lord of the dragon swirls his tail in lava....`
+    },
+    "/view/durawiki/raids/abdendriel-raids/dwarven-underground-tunnels": {
+        firstMessage: "WALLACE: DWARVES HAVE BEEN BUILDING SECRET UNDERGROUND TUNNELS UKNOWNST TO ALL! THEY MOVE NOW AFTER THE TREASURE OF THE AB'DENDRIEL ELVES!"
     }
 };
 

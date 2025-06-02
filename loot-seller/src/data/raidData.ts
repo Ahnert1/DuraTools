@@ -1,5 +1,5 @@
 // This file is auto-generated. Do not edit manually.
-// Generated on: 2025-05-30T15:48:39.213Z
+// Generated on: 2025-06-02T05:10:55.502Z
 
 export interface Raid {
   href: string;
@@ -186,7 +186,7 @@ export const raidData: Raid[] = [
   },
   {
     "href": "/view/durawiki/raids/abdendriel-raids/dwarven-underground-tunnels",
-    "firstMessage": "WALLACE: DWARVES HAVE BEEN BUILDING SECRET UNDERGROUND TUNNELS UNKNOWNST TO ALL! THEY MOVE NOW AFTER THE TREASURE OF THE ELVES!",
+    "firstMessage": "WALLACE: DWARVES HAVE BEEN BUILDING SECRET UNDERGROUND TUNNELS UKNOWNST TO ALL! THEY MOVE NOW AFTER THE TREASURE OF THE AB'DENDRIEL ELVES!",
     "secondMessage": "THE GREED OF THE DWARVES CANNOT BE SATISFIED... NO ELF OR TROLL IS SAFE!",
     "thirdMessage": "",
     "bossMessage": "",
@@ -456,7 +456,7 @@ export const raidData: Raid[] = [
   },
   {
     "href": "/view/durawiki/raids/ankrahmun-raids/bedouins-in-the-mine",
-    "firstMessage": "The Bedouin have come down from the rocky plateaus in the mountains where the wind is harsh and the night cold like keen daggers. They now dwell in the warmth of the upper caves of the mine.",
+    "firstMessage": "The Bedouin have come down from the rocky plateaus in the mountains where the wind is harsh and the night cold like keen daggers. They now dwell in the warmth of the upper and lower caves of the mine.",
     "secondMessage": "",
     "thirdMessage": "",
     "bossMessage": "",
@@ -1176,7 +1176,7 @@ export const raidData: Raid[] = [
   },
   {
     "href": "/view/durawiki/raids/ankrahmun-raids/khepresh-tortured-souls",
-    "firstMessage": "Tortured souls cannot escape the Kepresh even in death.. Centuries of burning and branding imbue the sands and soil with an energy of pure vengeance.",
+    "firstMessage": "Tortured souls cannot escape the Kepresh even in death.. Centuries of burning and branding imbue the sands and soil with an energy of pure vengeance",
     "secondMessage": "",
     "thirdMessage": "",
     "bossMessage": "",
@@ -1190,6 +1190,26 @@ export const raidData: Raid[] = [
     "floors": [
       "-7",
       "-8"
+    ],
+    "timeToSpawn": "?"
+  },
+  {
+    "href": "/view/durawiki/raids/ankrahmun-raids/khepresh-dreadseers",
+    "firstMessage": "A sadistic energy pulses amongst the halls where the ancient priests of Khepresh once worshipped and studied...",
+    "secondMessage": "Fiery fiends and seers flood into the Khepresh through a portal last open in ancient times, returning to wreak havoc on those who would question their mandate.",
+    "thirdMessage": "",
+    "bossMessage": "",
+    "name": "Khepresh Dreadseers",
+    "location": "Khepresh(Library, High Priest's Wing)",
+    "mobs": [
+      "Demon",
+      "Dreadseer"
+    ],
+    "bosses": [],
+    "floors": [
+      "-4",
+      "-5",
+      "-6"
     ],
     "timeToSpawn": "?"
   },
@@ -3170,10 +3190,10 @@ export const raidData: Raid[] = [
   },
   {
     "href": "/view/durawiki/raids/thais-raids/fibula-dragon-lords",
-    "firstMessage": "",
-    "secondMessage": "",
+    "firstMessage": "The Dragons of Fibula are stirred from their slumbers by the hammers of the day and revelries of night, the minotaurs flee...",
+    "secondMessage": "The noise of shields only rankles them further.",
     "thirdMessage": "",
-    "bossMessage": "The Dragons of Fibula are stirred from their slumbers by the hammers of the day and revelries of night, the minotaurs flee...",
+    "bossMessage": "A lord of the dragon tears out of the earth....\n        or\n        A lord of the dragon swirls his tail in lava....",
     "name": "Fibula Dragon Lords",
     "location": "Deeper Fibula",
     "mobs": [
