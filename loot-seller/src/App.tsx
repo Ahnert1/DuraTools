@@ -482,7 +482,7 @@ function App() {
       // Remove timestamp and elapsed time from the line
       const cleanLine = line
         .replace(/^\d{2}:\d{2}\s+/, '') // Remove timestamp
-        .replace(/\s*\(\d+\s+minutes?\s+ago\)\s*$/, '') // Remove elapsed time
+        .replace(/\(\s*(\d+)\s+minutes?\s+ago\s*\)/i, '') // Remove elapsed time
         .trim()
         .replace(/\u00A0/g, ' ')
 
@@ -494,7 +494,7 @@ function App() {
         ].filter(Boolean);
 
         return messages.some(message =>
-          cleanLine.toLowerCase().includes(message.toLowerCase())
+          message.toLowerCase().includes(cleanLine.toLowerCase())
         );
       });
 
