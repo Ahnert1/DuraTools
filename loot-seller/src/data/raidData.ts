@@ -1,5 +1,5 @@
 // This file is auto-generated. Do not edit manually.
-// Generated on: 2025-06-03T04:10:27.014Z
+// Generated on: 2025-06-03T06:25:52.550Z
 
 export interface Raid {
   href: string;
@@ -1518,7 +1518,7 @@ export const raidData: Raid[] = [
   {
     "href": "/view/durawiki/raids/carlin-raids/studious-minds",
     "firstMessage": "The studious minds of the most aged beholders search the realm for a place with foes worthy of challenging their renouned intellect.",
-    "secondMessage": "The Maze of Lost Souls presents an ideal destination. Beholder kin of both copper and ashen complexion migrate there to mentally spar.",
+    "secondMessage": "The Maze of Lost Souls presents an ideal destination. Beholder kin of both copper and ashen complexion migrate there hoping to mentally spar.",
     "thirdMessage": "",
     "bossMessage": "",
     "name": "Studious Minds",

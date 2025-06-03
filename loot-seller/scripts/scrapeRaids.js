@@ -276,6 +276,9 @@ const raidOverrides = {
     },
     "/view/durawiki/raids/kazordoon-raids/army-of-orcs": {
         firstMessage: "An army of orcs cut across the midlands. Orcs don't go round hills, they go through them!"
+    },
+    "/view/durawiki/raids/carlin-raids/studious-minds": {
+        secondMessage: "The Maze of Lost Souls presents an ideal destination. Beholder kin of both copper and ashen complexion migrate there hoping to mentally spar."
     }
 };
 
