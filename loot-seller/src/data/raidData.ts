@@ -1,5 +1,5 @@
 // This file is auto-generated. Do not edit manually.
-// Generated on: 2025-06-02T13:09:21.813Z
+// Generated on: 2025-06-03T04:10:27.014Z
 
 export interface Raid {
   href: string;
@@ -804,8 +804,8 @@ export const raidData: Raid[] = [
   },
   {
     "href": "/view/durawiki/raids/ankrahmun-raids/oozes-into-the-caves",
-    "firstMessage": "Wretched creatures of tar rove out of the thick pools they were birthed from in the caves of the Kha'labal, for many a man and woman was thrown into these pools as a secret and trailess death.",
-    "secondMessage": "In time an alchemic merger occured, painless and giant forms of tar married with the primitive will of sentience. Those who live in the caves make for the upper and northern recesses hoping to not cross path with these abominations.",
+    "firstMessage": "Wretched creatures of tar rove out of the thick pools they were birthed from in the caves of the Kha'labal, for many a man and woman was thrown into these pools as a secret and trailess death.",
+    "secondMessage": "In time an alchemic merger occured, painless and giant forms of tar married with the primitive will of sentience. Those who live in the caves make for the upper and northern recesses hoping to not cross path with these abominations.",
     "thirdMessage": "",
     "bossMessage": "",
     "name": "Oozes into the Caves",
@@ -2069,8 +2069,8 @@ export const raidData: Raid[] = [
   },
   {
     "href": "/view/durawiki/raids/edron-raids/hands-in-cyclopolis",
-    "firstMessage": "Where once there was only arms of mud and clay, hands of the doomed proliferate to haunt any who might approach",
-    "secondMessage": "Something stirs amongst the spiraling earthen depths of Cyclopolis",
+    "firstMessage": "Where once there was only arms of mud and clay, hands of the doomed proliferate to haunt any who might approach",
+    "secondMessage": "Something stirs amongst the spiraling earthen depths of Cyclopolis",
     "thirdMessage": "",
     "bossMessage": "",
     "name": "Hands in Cyclopolis",
@@ -2673,8 +2673,8 @@ export const raidData: Raid[] = [
   },
   {
     "href": "/view/durawiki/raids/kazordoon-raids/femor-hills-tombs",
-    "firstMessage": "The tombs of Femor Hills are sealed by too fragile of magic... Agents of the Brotherhood of Bones breach the enchantment, awakening the souls of those long at rest.",
-    "secondMessage": "Bones rattle and clank as they spill out over the surface!",
+    "firstMessage": "The tombs of Femor Hills are sealed by too fragile of magic... Agents of the Brotherhood of Bones breach the enchantment, awakening the souls of those long at rest.",
+    "secondMessage": "Bones rattle and clank as they spill out over the surface!",
     "thirdMessage": "",
     "bossMessage": "",
     "name": "Femor Hills Tombs",
@@ -3020,7 +3020,7 @@ export const raidData: Raid[] = [
   },
   {
     "href": "/view/durawiki/raids/rookgaard-raids/rookgaard-poison-spiders",
-    "firstMessage": "Venomous spiders are driven out by the fires of the trolls in northern Rookgaard!",
+    "firstMessage": "Venomous spiders are driven out by the fires of the trolls in northern Rookgaard!",
     "secondMessage": "",
     "thirdMessage": "",
     "bossMessage": "",
@@ -3150,7 +3150,7 @@ export const raidData: Raid[] = [
   {
     "href": "/view/durawiki/raids/thais-raids/fibula-beholders",
     "firstMessage": "The derelict subterranean architecture in the tunnels under Fibula brims with activity.",
-    "secondMessage": "Clicking sounds flitter in the air as watchful pupils blink in the darkness.",
+    "secondMessage": "Clicking sounds flitter in the air as watchful pupils blink in the darkness.",
     "thirdMessage": "",
     "bossMessage": "",
     "name": "Fibula Beholders",

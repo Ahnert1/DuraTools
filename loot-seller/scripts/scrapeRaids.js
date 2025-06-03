@@ -354,7 +354,7 @@ export interface Raid {
   timeToSpawn: string;
 }
 
-export const raidData: Raid[] = ${JSON.stringify(raidArray, null, 2)};
+export const raidData: Raid[] = ${JSON.stringify(raidArray, null, 2).replace(/\u00A0/g, ' ')};
 `;
 
     fs.writeFileSync(outputPath, fileContent);

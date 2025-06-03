@@ -483,7 +483,8 @@ function App() {
       const cleanLine = line
         .replace(/^\d{2}:\d{2}\s+/, '') // Remove timestamp
         .replace(/\s*\(\d+\s+minutes?\s+ago\)\s*$/, '') // Remove elapsed time
-        .trim();
+        .trim()
+        .replace(/\u00A0/g, ' ')
 
       // Find matching raid
       const matchingRaid = raidData.find(raid => {
