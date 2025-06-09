@@ -52,7 +52,7 @@ function App() {
     const savedMode = localStorage.getItem('raidViewMode');
     return (savedMode === 'time' || savedMode === 'location') ? savedMode : 'time';
   });
-  const [unmatchedLines, setUnmatchedLines] = useState<string[]>([]);
+  const [unmatchedLines, setUnmatchedLines] = useState<{ line: string, elapsedTime: number }[]>([]);
 
   // Add new function to get random mob/item
   const getRandomMob = useCallback(() => {
@@ -441,30 +441,6 @@ function App() {
     };
   }, []);
 
-  // Organize entries into an object where the keys are NPC names and values are arrays of items
-  const groupedEntries = useMemo(() => {
-    const entriesByNpc: Record<string, (ExtendedItemData)[]> = {};
-
-    tableEntries.forEach(entry => {
-      // For each NPC that buys this item
-      entry.npcNames.forEach(npcName => {
-        if (!entriesByNpc[npcName]) {
-          entriesByNpc[npcName] = [];
-        }
-
-        // Check if we already added this item to this NPC
-        const existingItemIndex = entriesByNpc[npcName].findIndex(item => item.id === entry.id);
-
-        if (existingItemIndex === -1) {
-          // Add the item to this NPC's list
-          entriesByNpc[npcName].push(entry);
-        }
-      });
-    });
-
-    return entriesByNpc;
-  }, [tableEntries]);
-
   const handleTabChange = (value: string) => {
     setActiveTab(value);
   };
@@ -472,7 +448,7 @@ function App() {
   const parseRaidLog = (input: string) => {
     const lines = input.split('\n').filter(line => line.trim());
     const raids: ParsedRaid[] = [];
-    const unmatchedLines: string[] = [];
+    const unmatchedLines: { line: string, elapsedTime: number }[] = [];
 
     lines.forEach(line => {
       // Extract elapsed time
@@ -517,7 +493,7 @@ function App() {
           );
         });
         if (!matchingRaid) {
-          unmatchedLines.push(cleanLine);
+          unmatchedLines.push({ line: cleanLine, elapsedTime: elapsedTime ? parseInt(elapsedTime) : 0 });
         }
       }
     });
@@ -526,22 +502,20 @@ function App() {
     setUnmatchedLines(unmatchedLines);
   };
 
-  // Add this effect in the App component
   useEffect(() => {
     parseRaidLog(raidLogInput);
   }, [raidLogInput]);
 
-  // Add this new function to sort/group raids
   const getSortedRaids = useMemo(() => {
     if (raidViewMode === 'time') {
-      return [...parsedRaids].sort((a, b) => {
+      return [...parsedRaids, ...unmatchedLines.map(u => ({ name: u.line, mobs: [], elapsedTime: u.elapsedTime }))].sort((a, b) => {
         const timeA = a.elapsedTime || 0;
         const timeB = b.elapsedTime || 0;
         return timeA - timeB;
       });
     } else {
       // Group by location
-      const groupedRaids = parsedRaids.reduce((acc, raid) => {
+      const groupedRaids = [...parsedRaids, ...unmatchedLines.map(u => ({ name: u.line, location: "Unknown", mobs: [], elapsedTime: u.elapsedTime }))].reduce((acc, raid) => {
         if (!acc[raid.location]) {
           acc[raid.location] = [];
         }
@@ -645,12 +619,7 @@ function App() {
                 </div>
                 {unmatchedLines.length > 0 && (
                   <div className="unmatched-lines-message">
-                    {unmatchedLines.length} lines not matched:
-                    <ul>
-                      {unmatchedLines.map((line, index) => (
-                        <li key={index}>{line}</li>
-                      ))}
-                    </ul>
+                    {unmatchedLines.length} raid(s) not found.  Godlike will work on updating these!
                   </div>
                 )}
               </div>
@@ -671,17 +640,17 @@ function App() {
                       // Time-based view
                       (getSortedRaids as ParsedRaid[]).map((raid: ParsedRaid, index: number) => (
                         <tr key={index}>
-                          <td>
-                            <RaidTooltip raidName={raid.name} />
+                          <td style={{ maxWidth: '200px' }}>
+                            <RaidTooltip raidName={raid.mobs.length ? raid.name : "?"} />
                           </td>
-                          <td>
+                          <td colSpan={raid.mobs.length ? 1 : 2}>
                             <div className="flex flex-wrap gap-4">
-                              {raid.mobs.map((mobName: string, mobIndex: number) => (
+                              {raid.mobs.length ? raid.mobs.map((mobName: string, mobIndex: number) => (
                                 <MobCell key={mobIndex} mobName={mobName} />
-                              ))}
+                              )) : raid.name}
                             </div>
                           </td>
-                          <td>{raid.location}</td>
+                          {raid.location && <td>{raid.location}</td>}
                           <td>{raid.elapsedTime ? (raid.elapsedTime > 60
                             ? `${Math.floor(raid.elapsedTime / 60)} hours and ${raid.elapsedTime % 60} minutes ago`
                             : `${raid.elapsedTime} minutes ago`) : 'Now'}</td>
@@ -698,14 +667,14 @@ function App() {
                           </tr>
                           {raids.map((raid: ParsedRaid, index: number) => (
                             <tr key={`${location}-${index}`}>
-                              <td>
-                                <RaidTooltip raidName={raid.name} />
+                              <td style={{ maxWidth: '200px' }}>
+                                <RaidTooltip raidName={raid.mobs.length ? raid.name : "?"} />
                               </td>
                               <td>
                                 <div className="flex flex-wrap gap-4">
-                                  {raid.mobs.map((mobName: string, mobIndex: number) => (
+                                  {raid.mobs.length ? raid.mobs.map((mobName: string, mobIndex: number) => (
                                     <MobCell key={mobIndex} mobName={mobName} />
-                                  ))}
+                                  )) : raid.name}
                                 </div>
                               </td>
                               {raidViewMode != 'location' && <td>{raid.location}</td>}
@@ -719,7 +688,7 @@ function App() {
                     )}
                   </tbody>
                 </table>
-                {parsedRaids.length === 0 && (
+                {getSortedRaids.length === 0 && (
                   <div className="no-items-message">
                     Paste your entire raid log for analysis
                   </div>

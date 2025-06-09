@@ -1,5 +1,5 @@
 // This file is auto-generated. Do not edit manually.
-// Generated on: 2025-06-03T06:25:52.550Z
+// Generated on: 2025-06-09T14:11:27.575Z
 
 export interface Raid {
   href: string;
@@ -568,7 +568,7 @@ export const raidData: Raid[] = [
       "-3",
       "-4"
     ],
-    "timeToSpawn": "?"
+    "timeToSpawn": "13min"
   },
   {
     "href": "/view/durawiki/raids/ankrahmun-raids/forty-into-the-caves",
@@ -631,7 +631,7 @@ export const raidData: Raid[] = [
   },
   {
     "href": "/view/durawiki/raids/ankrahmun-raids/khazeel-djinns",
-    "firstMessage": "With the Orcs failing their task, the Efreet of Mal'ouquah and the Marid of Ashta'daramai cross now from their tall fortresses amidst the sky to the high mountains of Kha'zeel...",
+    "firstMessage": "With the Orcs failing their task, the Efreet of Mal'ouquah and the Marid of Ashta'daramai marshall their soldiers to pour out of their tall fortresses amidst the sky down into the high mountains of Kha'zeel...",
     "secondMessage": "Green Djinn make for the northern mountains in emmissary to the dragons in effort to ally with them against the Marid there. Blue Djinn fly down to the south for the smaller but more powerful clan.",
     "thirdMessage": "",
     "bossMessage": "",
@@ -749,7 +749,7 @@ export const raidData: Raid[] = [
   },
   {
     "href": "/view/durawiki/raids/ankrahmun-raids/monks-into-the-tomb",
-    "firstMessage": "Order from the Isle of Kings has dispatched warrior monks on crusade to purge the blasphemous tombs of the ancient kingdom; their spiritual fervor has ensared the faith of many a bedouin.",
+    "firstMessage": "Order from the Isle of Kings has dispatched warrior monks on crusade to purge the blasphemous tombs of the ancient kingdom; their spiritual fervor has ensnared the faith of many a bedouin.",
     "secondMessage": "",
     "thirdMessage": "",
     "bossMessage": "",
@@ -1176,7 +1176,7 @@ export const raidData: Raid[] = [
   },
   {
     "href": "/view/durawiki/raids/ankrahmun-raids/khepresh-tortured-souls",
-    "firstMessage": "Tortured souls cannot escape the Kepresh even in death.. Centuries of burning and branding imbue the sands and soil with an energy of pure vengeance",
+    "firstMessage": "Tortured souls cannot escape the Kepresh even in death.. Centuries of burning and branding imbue the sands and soil with an energy of pure vengeance.",
     "secondMessage": "",
     "thirdMessage": "",
     "bossMessage": "",
@@ -1647,7 +1647,7 @@ export const raidData: Raid[] = [
       "-3",
       "-4"
     ],
-    "timeToSpawn": "?"
+    "timeToSpawn": "10min"
   },
   {
     "href": "/view/durawiki/raids/darashia-raids/drefia-hands",
@@ -1931,7 +1931,7 @@ export const raidData: Raid[] = [
   },
   {
     "href": "/view/durawiki/raids/edron-raids/dragon-lords-in-cyclopolis",
-    "firstMessage": "",
+    "firstMessage": "The Dragon Lords convene with the Behemoths; cunning with strength ...the air shrieks with fire and the ground rumbles with the steps of giants.",
     "secondMessage": "",
     "thirdMessage": "",
     "bossMessage": "The Dragon Lords convene with the Behemoths; cunning with strenght... The air shrieks with fire and the ground rumbles with the steps of giants...",
@@ -2014,7 +2014,7 @@ export const raidData: Raid[] = [
   },
   {
     "href": "/view/durawiki/raids/edron-raids/game-of-edron-grow-fattened",
-    "firstMessage": "The game of Edron grow fattened and so the wolves follow and thereafter the huntsman follows.",
+    "firstMessage": "The game of Edron grow fattened and so the wolves follow. Amateur bandits emerge from their hideouts, eager to fill their bellies.",
     "secondMessage": "",
     "thirdMessage": "",
     "bossMessage": "",
@@ -2127,7 +2127,7 @@ export const raidData: Raid[] = [
   },
   {
     "href": "/view/durawiki/raids/edron-raids/hero-cave-tar-oozes",
-    "firstMessage": "The only thing fouler than demons is the molten pits of evil from which they spawn..",
+    "firstMessage": "The only thing fouler than demons is the molten pits of evil from which they spawn...",
     "secondMessage": "Deep below the halls of the Heroes, long dormant pools of magma become active and surge forth.",
     "thirdMessage": "",
     "bossMessage": "",
@@ -2161,7 +2161,7 @@ export const raidData: Raid[] = [
   },
   {
     "href": "/view/durawiki/raids/edron-raids/orcs-bridged-to-edron",
-    "firstMessage": "Orcs have bridged the sea between their homeland and Edron, who can be safe while the orcs hazard our waters?",
+    "firstMessage": "Orcs have bridged the sea between their homeland and Edron! Who can be safe while the orcs hazard our waters?",
     "secondMessage": "",
     "thirdMessage": "",
     "bossMessage": "",
@@ -3110,7 +3110,7 @@ export const raidData: Raid[] = [
   },
   {
     "href": "/view/durawiki/raids/thais-raids/beholders-mating",
-    "firstMessage": "Beholders are gathering for their mating season along the cliffs of Mt. Sternum. Their intelligence is matched by their orneriness at this time.",
+    "firstMessage": "Beholders are gathering for their mating season along the cliffs of Mt Sternum. Their intelligence is matched by their orneriness at this time.",
     "secondMessage": "",
     "thirdMessage": "",
     "bossMessage": "",
@@ -3342,7 +3342,7 @@ export const raidData: Raid[] = [
   },
   {
     "href": "/view/durawiki/raids/thais-raids/minotaurs-reveal-themselves",
-    "firstMessage": "he Minotaurs reveal themselves from the torch-lit depths along with the evils that share their dwelling; the ancient caverns run with horned hordes.",
+    "firstMessage": "The Minotaurs reveal themselves from the torch-lit depths along with the evils that share their dwelling; the ancient caverns run with horned hordes.",
     "secondMessage": "Smoke rises out of Mintwallin...",
     "thirdMessage": "",
     "bossMessage": "",
@@ -3772,7 +3772,7 @@ export const raidData: Raid[] = [
   },
   {
     "href": "/view/durawiki/raids/venore-raids/blood-will-stain-the-plain",
-    "firstMessage": "The Amazons cannot abide na all male society, they think it the epitome of chauvinism. The Men beg to differ! Male and Female blood will equally stain the plain.",
+    "firstMessage": "The Amazons cannot abide an all male society, they think it the epitome of chauvinism. The Men beg to differ! Male and Female blood will equally stain the plain.",
     "secondMessage": "",
     "thirdMessage": "",
     "bossMessage": "",

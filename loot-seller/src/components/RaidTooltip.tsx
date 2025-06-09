@@ -32,43 +32,43 @@ export function RaidTooltip({ raidName }: RaidTooltipProps) {
         };
     }, []);
 
-    if (!raid) return null;
-
     return (
         <div className="tooltip-container" ref={containerRef}>
             <span>{raidName}</span>
             <div className={`tooltip raid-tooltip ${tooltipPosition === 'top' ? 'tooltip-top' : 'tooltip-bottom'}`}>
                 <div className="tooltip-content">
-                    {raid.firstMessage && (
-                        <div className="tooltip-item">
-                            <strong>First Message:</strong> {raid.firstMessage}
-                        </div>
-                    )}
-                    {raid.secondMessage && (
-                        <div className="tooltip-item">
-                            <strong>Second Message:</strong> {raid.secondMessage}
-                        </div>
-                    )}
-                    {raid.thirdMessage && (
-                        <div className="tooltip-item">
-                            <strong>Third Message:</strong> {raid.thirdMessage}
-                        </div>
-                    )}
-                    {raid.bossMessage && (
-                        <div className="tooltip-item">
-                            <strong>Boss Message:</strong> {raid.bossMessage}
-                        </div>
-                    )}
-                    {raid.floors && (
-                        <div className="tooltip-item">
-                            <strong>Floors:</strong> {raid.floors.join(', ')}
-                        </div>
-                    )}
-                    {raid.timeToSpawn && (
-                        <div className="tooltip-item">
-                            <strong>Time to Spawn:</strong> {raid.timeToSpawn}
-                        </div>
-                    )}
+                    {!raid ? <div className="tooltip-item">Unknown Raid<br /> Godlike will work on updating these!</div> : <>
+                        {raid.firstMessage && (
+                            <div className="tooltip-item">
+                                <strong>First Message:</strong> {raid.firstMessage}
+                            </div>
+                        )}
+                        {raid.secondMessage && (
+                            <div className="tooltip-item">
+                                <strong>Second Message:</strong> {raid.secondMessage}
+                            </div>
+                        )}
+                        {raid.thirdMessage && (
+                            <div className="tooltip-item">
+                                <strong>Third Message:</strong> {raid.thirdMessage}
+                            </div>
+                        )}
+                        {raid.bossMessage && (
+                            <div className="tooltip-item">
+                                <strong>Boss Message:</strong> {raid.bossMessage}
+                            </div>
+                        )}
+                        {raid.floors && (
+                            <div className="tooltip-item">
+                                <strong>Floors:</strong> {raid.floors.join(', ')}
+                            </div>
+                        )}
+                        {raid.timeToSpawn && (
+                            <div className="tooltip-item">
+                                <strong>Time to Spawn:</strong> {raid.timeToSpawn}
+                            </div>
+                        )}</>}
+
                 </div>
             </div>
         </div>

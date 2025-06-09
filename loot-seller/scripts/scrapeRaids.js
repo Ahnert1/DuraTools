@@ -279,6 +279,36 @@ const raidOverrides = {
     },
     "/view/durawiki/raids/carlin-raids/studious-minds": {
         secondMessage: "The Maze of Lost Souls presents an ideal destination. Beholder kin of both copper and ashen complexion migrate there hoping to mentally spar."
+    },
+    "/view/durawiki/raids/thais-raids/minotaurs-reveal-themselves": {
+        firstMessage: "The Minotaurs reveal themselves from the torch-lit depths along with the evils that share their dwelling; the ancient caverns run with horned hordes."
+    },
+    "/view/durawiki/raids/ankrahmun-raids/khepresh-tortured-souls": {
+        firstMessage: "Tortured souls cannot escape the Kepresh even in death.. Centuries of burning and branding imbue the sands and soil with an energy of pure vengeance."
+    },
+    "/view/durawiki/raids/edron-raids/orcs-bridged-to-edron": {
+        firstMessage: "Orcs have bridged the sea between their homeland and Edron! Who can be safe while the orcs hazard our waters?"
+    },
+    "/view/durawiki/raids/thais-raids/beholders-mating": {
+        firstMessage: "Beholders are gathering for their mating season along the cliffs of Mt Sternum. Their intelligence is matched by their orneriness at this time."
+    },
+    "/view/durawiki/raids/edron-raids/dragon-lords-in-cyclopolis": {
+        firstMessage: "The Dragon Lords convene with the Behemoths; cunning with strength ...the air shrieks with fire and the ground rumbles with the steps of giants."
+    },
+    "/view/durawiki/raids/ankrahmun-raids/khazeel-djinns": {
+        firstMessage: "With the Orcs failing their task, the Efreet of Mal'ouquah and the Marid of Ashta'daramai marshall their soldiers to pour out of their tall fortresses amidst the sky down into the high mountains of Kha'zeel..."
+    },
+    "/view/durawiki/raids/edron-raids/game-of-edron-grow-fattened": {
+        firstMessage: "The game of Edron grow fattened and so the wolves follow. Amateur bandits emerge from their hideouts, eager to fill their bellies."
+    },
+    "/view/durawiki/raids/ankrahmun-raids/monks-into-the-tomb": {
+        firstMessage: "Order from the Isle of Kings has dispatched warrior monks on crusade to purge the blasphemous tombs of the ancient kingdom; their spiritual fervor has ensnared the faith of many a bedouin."
+    },
+    "/view/durawiki/raids/venore-raids/blood-will-stain-the-plain": {
+        firstMessage: "The Amazons cannot abide an all male society, they think it the epitome of chauvinism. The Men beg to differ! Male and Female blood will equally stain the plain."
+    },
+    "/view/durawiki/raids/edron-raids/hero-cave-tar-oozes": {
+        firstMessage: "The only thing fouler than demons is the molten pits of evil from which they spawn..."
     }
 };
 
