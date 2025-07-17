@@ -16,6 +16,7 @@ import MobCell from './components/MobCell';
 import { mobData } from './data/mobData';
 import { ItemCreateModal } from './components/item-create-modal';
 import { RaidTooltip } from './components/RaidTooltip';
+import { BeginnerCopyingTip } from './components/BeginnerCopyingTip';
 
 function App() {
   // State for form fields
@@ -451,9 +452,42 @@ function App() {
     const unmatchedLines: { line: string, elapsedTime: number }[] = [];
 
     lines.forEach(line => {
-      // Extract elapsed time
-      const timeMatch = line.match(/\(\s*(\d+)\s+minutes?\s+ago\s*\)/i);
-      const elapsedTime = timeMatch ? timeMatch[1] : '';
+      // Extract timestamp from the beginning of the line
+
+      let elapsedTime = 0;
+
+      // Extract explicit elapsed time if present
+      const explicitTimeMatch = line.match(/\(\s*(\d+)\s+minutes?\s+ago\s*\)/i);
+      if (explicitTimeMatch) {
+        elapsedTime = parseInt(explicitTimeMatch[1]);
+      } else {
+        const timestampMatch = line.match(/^(\d{2}):(\d{2})\s+/);
+
+        if (timestampMatch) {
+          const hours = parseInt(timestampMatch[1]);
+          const minutes = parseInt(timestampMatch[2]);
+
+          // Calculate elapsed time based on current time
+          const now = new Date();
+          const currentHours = now.getHours();
+          const currentMinutes = now.getMinutes();
+
+          // Calculate total minutes for both times
+          const raidTimeMinutes = hours * 60 + minutes;
+          const currentTimeMinutes = currentHours * 60 + currentMinutes;
+
+          // Calculate difference (handle day wrap-around)
+          let timeDiff = currentTimeMinutes - raidTimeMinutes;
+          if (timeDiff < 0) {
+            timeDiff += 24 * 60; // Add 24 hours if negative (next day)
+          }
+
+          elapsedTime = timeDiff;
+        }
+      }
+
+
+
 
       // Remove timestamp and elapsed time from the line
       const cleanLine = line
@@ -478,7 +512,7 @@ function App() {
         raids.push({
           name: matchingRaid.name,
           mobs: matchingRaid.mobs,
-          elapsedTime: elapsedTime ? parseInt(elapsedTime) : 0,
+          elapsedTime: elapsedTime,
           location: matchingRaid.location
         });
       } else {
@@ -493,7 +527,7 @@ function App() {
           );
         });
         if (!matchingRaid) {
-          unmatchedLines.push({ line: cleanLine, elapsedTime: elapsedTime ? parseInt(elapsedTime) : 0 });
+          unmatchedLines.push({ line: cleanLine, elapsedTime: elapsedTime });
         }
       }
     });
@@ -619,7 +653,7 @@ function App() {
                 </div>
                 {unmatchedLines.length > 0 && (
                   <div className="unmatched-lines-message">
-                    {unmatchedLines.length} raid(s) not found.  Godlike will work on updating these!
+                    {unmatchedLines.length} raid message(s) not matched to known raids.  Godlike will work on updating these!
                   </div>
                 )}
               </div>
@@ -689,9 +723,7 @@ function App() {
                   </tbody>
                 </table>
                 {getSortedRaids.length === 0 && (
-                  <div className="no-items-message">
-                    Paste your entire raid log for analysis
-                  </div>
+                  <BeginnerCopyingTip handleImageError={handleImageError} />
                 )}
 
               </div>

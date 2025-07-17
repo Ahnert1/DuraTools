@@ -930,6 +930,10 @@ button:disabled {
 }
 
 .no-items-message{
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
   text-align: center;
   padding: 1rem;
 }
