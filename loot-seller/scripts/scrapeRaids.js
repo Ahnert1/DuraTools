@@ -309,6 +309,15 @@ const raidOverrides = {
     },
     "/view/durawiki/raids/edron-raids/hero-cave-tar-oozes": {
         firstMessage: "The only thing fouler than demons is the molten pits of evil from which they spawn..."
+    },
+    "/view/durawiki/raids/kazordoon-raids/depths-of-the-prison": {
+        firstMessage: "Up from the depths of the prison colossal monsters threaten every smith with death who does not make a Giant's weapon."
+    },
+    "/view/durawiki/raids/ankrahmun-raids/khepresh-tortured-souls": {
+        firstMessage: "Tortured souls cannot escape the Khepresh even in death.. Centuries of burning and branding imbue the sands and soil with an energy of pure vengeance."
+    },
+    "/view/durawiki/raids/edron-raids/edron-goblins": {
+        firstMessage: "WALLACE: THE GOBLIN TRIBES MEET WITH THE CAVE TROLLS TO RAID THE CITIZENS OF EDRON FOR TASTY MAN FLESH!"
     }
 };
 

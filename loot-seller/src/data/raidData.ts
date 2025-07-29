@@ -1,5 +1,5 @@
 // This file is auto-generated. Do not edit manually.
-// Generated on: 2025-06-09T14:11:27.575Z
+// Generated on: 2025-07-29T15:00:47.038Z
 
 export interface Raid {
   href: string;
@@ -437,6 +437,26 @@ export const raidData: Raid[] = [
     "timeToSpawn": "?"
   },
   {
+    "href": "/view/durawiki/raids/abdendriel-raids/abyss-elite-giant",
+    "firstMessage": "",
+    "secondMessage": "",
+    "thirdMessage": "",
+    "bossMessage": "The enslaved giants of the abyss send their elite to seek vengeance on the devotees of Shathur.",
+    "name": "Abyss Elite Giant",
+    "location": "Abyss",
+    "mobs": [
+      "Behemoth",
+      "Banshee"
+    ],
+    "bosses": [
+      "Kursaa"
+    ],
+    "floors": [
+      "-3"
+    ],
+    "timeToSpawn": "?"
+  },
+  {
     "href": "/view/durawiki/raids/ankrahmun-raids/beholder-army",
     "firstMessage": "Beholders are building an army and have found the perfect soldier in the long lost tombs of the Kha'labal; a creature of great strength but decrepit mind.",
     "secondMessage": "",
@@ -627,7 +647,7 @@ export const raidData: Raid[] = [
       "+2",
       "+1"
     ],
-    "timeToSpawn": "?"
+    "timeToSpawn": "10min"
   },
   {
     "href": "/view/durawiki/raids/ankrahmun-raids/khazeel-djinns",
@@ -1022,7 +1042,7 @@ export const raidData: Raid[] = [
     "thirdMessage": "",
     "bossMessage": "",
     "name": "Tomb Tar Oozes",
-    "location": "Lower Parrot Tomb",
+    "location": "Parrot Tomb's Crypt",
     "mobs": [
       "Tar Ooze"
     ],
@@ -1123,7 +1143,7 @@ export const raidData: Raid[] = [
     "thirdMessage": "The pharaohs of Khepresh see their workers' task list grow longer every day... They order the viziers to reanimate the slaves who perished aeons ago to raise the laborers in number.",
     "bossMessage": "",
     "name": "Khepresh Pharaohs",
-    "location": "Khepresh(Library, Map Room)",
+    "location": "Khepresh(Royal Halls, Ranoh Point, Map Room)",
     "mobs": [
       "Pharaoh",
       "Crawling Hand"
@@ -1142,12 +1162,14 @@ export const raidData: Raid[] = [
     "thirdMessage": "",
     "bossMessage": "",
     "name": "Khepresh Forty Thieves",
-    "location": "Khepresh(Library, High Priest's Wing, Map Room)",
+    "location": "Khepresh(Library, High Priests' Wing, Map Room)",
     "mobs": [
       "One of the Forty",
       "Bedouin",
       "Bedouin Wife",
-      "Dreadseer"
+      "Dreadseer",
+      "Pharaoh",
+      "Slime Ooze"
     ],
     "bosses": [],
     "floors": [
@@ -1176,15 +1198,15 @@ export const raidData: Raid[] = [
   },
   {
     "href": "/view/durawiki/raids/ankrahmun-raids/khepresh-tortured-souls",
-    "firstMessage": "Tortured souls cannot escape the Kepresh even in death.. Centuries of burning and branding imbue the sands and soil with an energy of pure vengeance.",
+    "firstMessage": "Tortured souls cannot escape the Khepresh even in death.. Centuries of burning and branding imbue the sands and soil with an energy of pure vengeance.",
     "secondMessage": "",
     "thirdMessage": "",
     "bossMessage": "",
     "name": "Khepresh Tortured Souls",
     "location": "Khepresh(Torture Room)",
     "mobs": [
-      "Crawling Hand",
-      "Demon"
+      "Tar Ooze",
+      "Crawling Hand"
     ],
     "bosses": [],
     "floors": [
@@ -1200,7 +1222,7 @@ export const raidData: Raid[] = [
     "thirdMessage": "",
     "bossMessage": "",
     "name": "Khepresh Dreadseers",
-    "location": "Khepresh(Library, High Priest's Wing)",
+    "location": "Khepresh(Library, High Priests' Wing)",
     "mobs": [
       "Demon",
       "Dreadseer"
@@ -1210,6 +1232,80 @@ export const raidData: Raid[] = [
       "-4",
       "-5",
       "-6"
+    ],
+    "timeToSpawn": "?"
+  },
+  {
+    "href": "/view/durawiki/raids/ankrahmun-raids/chieftain-in-khazeel",
+    "firstMessage": "",
+    "secondMessage": "",
+    "thirdMessage": "",
+    "bossMessage": "A chieftain with craggy complexion emerges from the crevaces of Kha'Zeel to discipline the beasts that reside there.",
+    "name": "Chieftain in Kha'zeel",
+    "location": "Kha'zeel's Northern Dragon Lair",
+    "mobs": [
+      "Behemoth",
+      "Dragon Lord"
+    ],
+    "bosses": [
+      "Urkraa"
+    ],
+    "floors": [
+      "+2",
+      "+1"
+    ],
+    "timeToSpawn": "?"
+  },
+  {
+    "href": "/view/durawiki/raids/ankrahmun-raids/gundlach-in-khepresh",
+    "firstMessage": "Gundlach wanders the wind-swept, waxen walls of Khepresh to find its great library... He yearns to unearth ancient accounts of the desert's dunes, flora, and forgotten fauna that he might bend to his will.",
+    "secondMessage": "",
+    "thirdMessage": "",
+    "bossMessage": "",
+    "name": "Gundlach in Khepresh",
+    "location": "Khepresh's Library",
+    "mobs": [
+      "-"
+    ],
+    "bosses": [],
+    "floors": [
+      "-6"
+    ],
+    "timeToSpawn": "?"
+  },
+  {
+    "href": "/view/durawiki/raids/ankrahmun-raids/zararus-in-khepresh",
+    "firstMessage": "",
+    "secondMessage": "",
+    "thirdMessage": "",
+    "bossMessage": "A malevolent mage, with eyes aglow and ambition as ancient as the ruins around him, prowls the crumbling corridors of Khepresh and plots to place himself atop the throne should the forgotten civilization there be resurrected.",
+    "name": "Zararus in Khepresh",
+    "location": "Khepresh Throne Room",
+    "mobs": [
+      "Warlock"
+    ],
+    "bosses": [
+      "Zararus"
+    ],
+    "floors": [
+      "-6"
+    ],
+    "timeToSpawn": "?"
+  },
+  {
+    "href": "/view/durawiki/raids/ankrahmun-raids/dragon-boss-in-khazeel",
+    "firstMessage": "A great beast draped in scales of fire and shadow sprawls majestically deep amidst the caverns of Kha'Zeel, ruling the realm of rock with a gaze that melts stone.",
+    "secondMessage": "",
+    "thirdMessage": "",
+    "bossMessage": "",
+    "name": "Dragon Boss in Kha'zeel",
+    "location": "Kha'zeel's Southern Dragon Lair",
+    "mobs": [
+      "Dragon Lord"
+    ],
+    "bosses": [],
+    "floors": [
+      "+3"
     ],
     "timeToSpawn": "?"
   },
@@ -1630,6 +1726,23 @@ export const raidData: Raid[] = [
     "timeToSpawn": "?"
   },
   {
+    "href": "/view/durawiki/raids/carlin-raids/gundlach-in-demona",
+    "firstMessage": "Gundlach reveals the power of Earth and Water to the Warlocks....",
+    "secondMessage": "",
+    "thirdMessage": "",
+    "bossMessage": "",
+    "name": "Gundlach in Demona",
+    "location": "Demona",
+    "mobs": [
+      "-"
+    ],
+    "bosses": [],
+    "floors": [
+      "-8"
+    ],
+    "timeToSpawn": "?"
+  },
+  {
     "href": "/view/durawiki/raids/darashia-raids/drefia-demons",
     "firstMessage": "Demons rise in the depths of Drefia! The Sages say time is your only friend, but time may sometimes trap you...",
     "secondMessage": "",
@@ -1953,7 +2066,7 @@ export const raidData: Raid[] = [
   },
   {
     "href": "/view/durawiki/raids/edron-raids/edron-goblins",
-    "firstMessage": "WALLACE: THE GOBLIN TRIBES MEET WITH THE CAVE TROLLS TO RAID THE CITIZENS OF EDRON FOR TASTY MAN FLESH.",
+    "firstMessage": "WALLACE: THE GOBLIN TRIBES MEET WITH THE CAVE TROLLS TO RAID THE CITIZENS OF EDRON FOR TASTY MAN FLESH!",
     "secondMessage": "",
     "thirdMessage": "",
     "bossMessage": "",
@@ -2504,7 +2617,7 @@ export const raidData: Raid[] = [
   },
   {
     "href": "/view/durawiki/raids/kazordoon-raids/depths-of-the-prison",
-    "firstMessage": "",
+    "firstMessage": "Up from the depths of the prison colossal monsters threaten every smith with death who does not make a Giant's weapon.",
     "secondMessage": "",
     "thirdMessage": "",
     "bossMessage": "Up from the depths of the prison colossal monsters crush every Dwarf who brings them a weapon that blunts against their skin.",
