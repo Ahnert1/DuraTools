@@ -1,23 +1,78 @@
 'use client'
 
 import React from 'react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../@/components/ui/dialog'
-import { saveCustomItem } from '../utils/local-storage'
+import { saveCustomItem, updateCustomItem, getCustomItems } from '../utils/local-storage'
 import placeholderBase64 from '../utils/placeholder-base64'
 import { capitalize } from '../utils/helpers'
+import { ExtendedItemData } from '../models/ExtendedItemData'
 
 interface ItemCreateModalProps {
     open: boolean
     name: string
     onClose: () => void
     onCreated: () => void
+    isEditMode?: boolean
+    itemToEdit?: ExtendedItemData | null
 }
 
-export function ItemCreateModal({ open, name, onClose, onCreated }: ItemCreateModalProps) {
+export function ItemCreateModal({ open, name, onClose, onCreated, isEditMode = false, itemToEdit = null }: ItemCreateModalProps) {
     const [value, setValue] = useState('')
     const [imagePreview, setImagePreview] = useState<string>(placeholderBase64)
     const [imageError, setImageError] = useState<string>('')
+    const [npcNames, setNpcNames] = useState<string[]>([])
+    const [newNpcName, setNewNpcName] = useState('')
+    const [editMode, setEditMode] = useState(false)
+    const [originalItemName, setOriginalItemName] = useState<string>('')
+
+    // Load item data when editing
+    useEffect(() => {
+        if (isEditMode && itemToEdit) {
+            setValue(itemToEdit.value.toString())
+            setImagePreview(itemToEdit.imageBase64 || placeholderBase64)
+            setNpcNames(itemToEdit.npcNames.filter(name => name !== "Custom - No names were provided"))
+            setOriginalItemName(itemToEdit.name)
+            setEditMode(true)
+        } else if (!isEditMode) {
+            // Reset form for create mode
+            setValue('')
+            setImagePreview(placeholderBase64)
+            setNpcNames([])
+            setNewNpcName('')
+            setEditMode(false)
+            setOriginalItemName('')
+        }
+    }, [isEditMode, itemToEdit])
+
+    // Handle INSERT key for edit mode
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === 'Insert' && !isEditMode) {
+                e.preventDefault()
+                // Find the item to edit based on current name
+                const customItems = getCustomItems()
+                const itemToEdit = customItems.find(item =>
+                    item.name.toLowerCase() === name.toLowerCase()
+                )
+                if (itemToEdit) {
+                    setValue(itemToEdit.value.toString())
+                    setImagePreview(itemToEdit.imageBase64 || placeholderBase64)
+                    setNpcNames(itemToEdit.npcNames.filter(name => name !== "Custom - No names were provided"))
+                    setOriginalItemName(itemToEdit.name)
+                    setEditMode(true)
+                }
+            }
+        }
+
+        if (open) {
+            document.addEventListener('keydown', handleKeyDown)
+        }
+
+        return () => {
+            document.removeEventListener('keydown', handleKeyDown)
+        }
+    }, [open, name, isEditMode])
 
     function handleImageUpload(event: React.ChangeEvent<HTMLInputElement>) {
         const file = event.target.files?.[0]
@@ -45,15 +100,38 @@ export function ItemCreateModal({ open, name, onClose, onCreated }: ItemCreateMo
         reader.readAsDataURL(file)
     }
 
+    function handleAddNpc() {
+        if (newNpcName.trim() && !npcNames.includes(newNpcName.trim())) {
+            // Capitalize each word in the NPC name
+            const capitalizedName = newNpcName.trim().split(' ').map(word =>
+                word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+            ).join(' ');
+            setNpcNames([...npcNames, capitalizedName])
+            setNewNpcName('')
+        }
+    }
+
+    function handleRemoveNpc(index: number) {
+        setNpcNames(npcNames.filter((_, i) => i !== index))
+    }
+
     function handleCreate() {
         if (!name || !value) return
-        saveCustomItem({
+
+        const itemData = {
             name: capitalize(name),
             value: Number(value),
             imageBase64: imagePreview,
             category: "Custom",
-            npcNames: ["Custom"]
-        })
+            npcNames: npcNames.length > 0 ? npcNames : ["Custom - No names were provided"]
+        }
+
+        if (editMode && originalItemName) {
+            updateCustomItem(originalItemName, itemData)
+        } else {
+            saveCustomItem(itemData)
+        }
+
         onCreated()
         handleClose()
     }
@@ -61,6 +139,10 @@ export function ItemCreateModal({ open, name, onClose, onCreated }: ItemCreateMo
     const handleClose = () => {
         setValue('')
         setImagePreview(placeholderBase64)
+        setNpcNames([])
+        setNewNpcName('')
+        setEditMode(false)
+        setOriginalItemName('')
         onClose()
     }
 
@@ -68,7 +150,7 @@ export function ItemCreateModal({ open, name, onClose, onCreated }: ItemCreateMo
         <Dialog open={open} onOpenChange={handleClose}>
             <DialogContent disabled={value.length == 0}>
                 <DialogHeader>
-                    <DialogTitle>Create Custom Item</DialogTitle>
+                    <DialogTitle>{editMode ? 'Edit Custom Item' : 'Create Custom Item'}</DialogTitle>
                 </DialogHeader>
                 <div className="mb-4">
                     <label htmlFor="image" className="block mb-2">{name}</label>
@@ -98,7 +180,7 @@ export function ItemCreateModal({ open, name, onClose, onCreated }: ItemCreateMo
                     </div>
                 </div>
                 <div className="mb-4">
-                    <label htmlFor="value">Value</label>
+                    <label htmlFor="value">*Value</label>
                     <input
                         id="value"
                         placeholder="0 - 10,000,000"
@@ -110,12 +192,59 @@ export function ItemCreateModal({ open, name, onClose, onCreated }: ItemCreateMo
                         className="w-full"
                     />
                 </div>
+                <div className="mb-4">
+                    <label htmlFor="npc-names" className="block mb-2">NPCs that sell this item (Optional)</label>
+                    <div className="flex gap-2 mb-2">
+                        <input
+                            id="npc-names"
+                            type="text"
+                            placeholder="Custom NPC Name"
+                            value={newNpcName}
+                            onChange={e => setNewNpcName(e.target.value)}
+                            onKeyPress={e => {
+                                if (e.key === 'Enter') {
+                                    e.preventDefault()
+                                    handleAddNpc()
+                                }
+                            }}
+                            className="flex-1"
+                        />
+                        <button
+                            onClick={handleAddNpc}
+                            disabled={!newNpcName.trim() || npcNames.includes(newNpcName.trim().split(' ').map(word =>
+                                word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+                            ).join(' '))}
+                            className="w-10 h-10 bg-green-500 text-white rounded-lg hover:bg-green-600 disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center transition-colors duration-200 shadow-md hover:shadow-lg"
+                            title="Add NPC"
+                        >
+                            +
+                        </button>
+                    </div>
+                    {npcNames.length > 0 && (
+                        <div className="flex flex-wrap gap-2">
+                            {npcNames.map((npc, index) => (
+                                <div key={index} className="flex items-center gap-1 bg-gray-100 px-2 py-1 rounded">
+                                    <span className="text-sm">{npc}</span>
+                                    <button
+                                        onClick={() => handleRemoveNpc(index)}
+                                        className="remove-npc-btn text-red-500 hover:text-red-700 text-sm font-bold transition-colors duration-200"
+                                    >
+                                        ×
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                    {npcNames.length === 0 && (
+                        <p className="text-sm text-gray-500">No NPCs added. Item will be marked as "Custom".</p>
+                    )}
+                </div>
                 <button
                     onClick={handleCreate}
                     disabled={!value || isNaN(Number(value)) || Number(value) <= 0 || Number(value) > 10000000}
                     className="create-button"
                 >
-                    Create
+                    {editMode ? 'Update' : 'Create'}
                 </button>
             </DialogContent>
         </Dialog>

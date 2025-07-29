@@ -14,6 +14,15 @@ export function saveCustomItem(item: ExtendedItemData) {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(items))
 }
 
+export function updateCustomItem(originalName: string, updatedItem: ExtendedItemData) {
+    const items = getCustomItems()
+    const updatedItems = items.map(item =>
+        item.name === originalName ? updatedItem : item
+    )
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedItems))
+    return updatedItems
+}
+
 export function deleteCustomItem(name: string): ExtendedItemData[] {
     const items = getCustomItems()
     const newItems = items.filter(item => item.name !== name)

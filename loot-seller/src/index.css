@@ -113,6 +113,10 @@ button:hover:not([role="tab"]) {
   background-color: #45a049;
 }
 
+.remove-npc-btn:hover {
+  background-color: #ff4d4d !important;
+}
+
 button:disabled {
   background-color: #cccccc;
   cursor: not-allowed;
@@ -185,6 +189,20 @@ button:disabled {
   position:absolute;
   top: 1rem;
   right: 0.1rem;
+  font-size: 0.5rem;
+  color: #888;
+  background: #f0f0f0;
+  border-radius: 6px;
+  z-index: 20;
+  pointer-events: none;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  letter-spacing: 0.03em;
+}
+
+.search-results-insert-tip {
+  position:absolute;
+  top: 1rem;
+  right: 5rem;
   font-size: 0.5rem;
   color: #888;
   background: #f0f0f0;

@@ -44,6 +44,7 @@ function App() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
   const [customItems, setCustomItems] = useState<ExtendedItemData[]>([])
   const [searchResultsKey, setSearchResultsKey] = useState(0);
+  const [itemToEdit, setItemToEdit] = useState<ExtendedItemData | null>(null)
   // Add new state for active tab
   const [activeTab, setActiveTab] = useState("raids");
   // Add these state variables in the App component
@@ -174,6 +175,15 @@ function App() {
       setCustomItems(newCustomItems);
       handleDeleteItem(searchResults[0].name ?? '', true);
       handleSearchChange({ target: { value: searchQuery } } as React.ChangeEvent<HTMLInputElement>);
+    }
+  }
+
+  const handleInsertKeyUp = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.code === "Insert" && searchResults.length > 0 && searchResults[0].category === CATEGORIES.CUSTOM) {
+      e.preventDefault();
+      setItemToEdit(searchResults[0]);
+      setIsCreateModalOpen(true);
+      setShowResults(false);
     }
   }
 
@@ -392,9 +402,35 @@ function App() {
   const handleCreatedCustomItem = useCallback(() => {
     const newCustomItems = getCustomItems()
     setCustomItems(newCustomItems)
-    const newCustomItem = newCustomItems[newCustomItems.length - 1]
-    setSelectedItem(newCustomItem)
-    setSearchQuery(newCustomItem.name)
+
+    // If we were editing an item, find the updated item by name
+    // Otherwise, get the last item (newly created)
+    let targetItem: ExtendedItemData
+    if (itemToEdit) {
+      // Find the updated item by the original item name (not the search query)
+      targetItem = newCustomItems.find(item => item.name.toLowerCase() === itemToEdit.name.toLowerCase()) || newCustomItems[newCustomItems.length - 1]
+
+      // Update table entries that use this edited item
+      setTableEntries(prevEntries =>
+        prevEntries.map(entry => {
+          if (entry.name === itemToEdit.name) {
+            return {
+              ...entry,
+              value: targetItem.value * (entry.quantity ?? 1),
+              imageBase64: targetItem.imageBase64,
+              npcNames: targetItem.npcNames
+            }
+          }
+          return entry
+        })
+      )
+    } else {
+      // For newly created items, get the last item
+      targetItem = newCustomItems[newCustomItems.length - 1]
+    }
+
+    setSelectedItem(targetItem)
+    setSearchQuery(targetItem.name)
     // Use requestAnimationFrame to ensure state updates have completed
     requestAnimationFrame(() => {
       if (quantityInputRef.current) {
@@ -402,7 +438,7 @@ function App() {
         quantityInputRef.current.select();
       }
     });
-  }, [])
+  }, [itemToEdit, searchQuery])
 
   // Delete item from table
   const handleDeleteItem = (name: string, deleteFromCustomItems: boolean = false) => {
@@ -415,6 +451,11 @@ function App() {
       const updatedCustomItems = deleteCustomItem(name);
       setCustomItems(updatedCustomItems);
       setSearchResultsKey(prev => prev + 1);
+
+      // Also remove all table entries that use this deleted custom item
+      setTableEntries(prevEntries =>
+        prevEntries.filter(entry => entry.name !== name)
+      );
     }
   };
 
@@ -760,7 +801,10 @@ function App() {
                       onFocus={handleSearchFocus}
                       onBlur={() => setIsItemNameInputFocused(false)}
                       onKeyPress={handleSearchKeyPress}
-                      onKeyUp={handleDeleteKeyUp}
+                      onKeyUp={(e) => {
+                        handleDeleteKeyUp(e);
+                        handleInsertKeyUp(e);
+                      }}
                       onKeyDown={e => {
                         if (e.key === 'Escape') {
                           setSearchQuery('');
@@ -789,7 +833,12 @@ function App() {
                               onClick={() => handleSelectItem(item)}
                             >
                               {searchQuery.trim().length > 0 && isItemNameInputFocused && <span className="search-results-enter-tip">Press ENTER to accept</span>}
-                              {item.category === CATEGORIES.CUSTOM && isItemNameInputFocused && <span className={` ${searchQuery.trim().length > 0 ? 'search-results-delete-tip' : "search-results-enter-tip"}`}>Press DEL to delete</span>}
+                              {item.category === CATEGORIES.CUSTOM && isItemNameInputFocused && index === 0 && item.name.toLowerCase().startsWith(searchQuery.trim().toLowerCase()) && (
+                                <>
+                                  <span className={` ${searchQuery.trim().length > 0 ? 'search-results-delete-tip' : "search-results-enter-tip"}`}>Press DEL to delete</span>
+                                  <span className="search-results-insert-tip">Press INSERT to edit</span>
+                                </>
+                              )}
                               <div className="item-row">
                                 <div className="item-image">
                                   <img
@@ -911,7 +960,7 @@ function App() {
                           </div>
                         </td>
                         <td style={{ textAlign: 'center', width: '40px' }}>
-                          {entry.category !== CATEGORIES.CUSTOM && <div className="tooltip-container">
+                          <div className="tooltip-container">
                             <span className="npc-count">&#9432;</span>
                             < div className="tooltip">
                               <div className="tooltip-content">
@@ -920,7 +969,7 @@ function App() {
                                 ))}
                               </div>
                             </div>
-                          </div>}
+                          </div>
                         </td>
                         <td>
                           <button
@@ -968,9 +1017,14 @@ function App() {
       )}
       <ItemCreateModal
         open={isCreateModalOpen}
-        name={searchQuery.trim().charAt(0).toUpperCase() + searchQuery.trim().slice(1)}
-        onClose={() => setIsCreateModalOpen(false)}
+        name={itemToEdit ? itemToEdit.name : searchQuery.trim().charAt(0).toUpperCase() + searchQuery.trim().slice(1)}
+        onClose={() => {
+          setIsCreateModalOpen(false)
+          setItemToEdit(null)
+        }}
         onCreated={handleCreatedCustomItem}
+        isEditMode={!!itemToEdit}
+        itemToEdit={itemToEdit}
       />
     </div>
   );
