@@ -25,6 +25,9 @@ export function ItemCreateModal({ open, name, onClose, onCreated, isEditMode = f
     const [newNpcName, setNewNpcName] = useState('')
     const [editMode, setEditMode] = useState(false)
     const [originalItemName, setOriginalItemName] = useState<string>('')
+    const [originalValue, setOriginalValue] = useState<number>(0)
+    const [originalImage, setOriginalImage] = useState<string>('')
+    const [originalNpcNames, setOriginalNpcNames] = useState<string[]>([])
 
     // Load item data when editing
     useEffect(() => {
@@ -33,6 +36,9 @@ export function ItemCreateModal({ open, name, onClose, onCreated, isEditMode = f
             setImagePreview(itemToEdit.imageBase64 || placeholderBase64)
             setNpcNames(itemToEdit.npcNames.filter(name => name !== "Custom - No names were provided"))
             setOriginalItemName(itemToEdit.name)
+            setOriginalValue(itemToEdit.value)
+            setOriginalImage(itemToEdit.imageBase64 || placeholderBase64)
+            setOriginalNpcNames(itemToEdit.npcNames.filter(name => name !== "Custom - No names were provided"))
             setEditMode(true)
         } else if (!isEditMode) {
             // Reset form for create mode
@@ -42,8 +48,26 @@ export function ItemCreateModal({ open, name, onClose, onCreated, isEditMode = f
             setNewNpcName('')
             setEditMode(false)
             setOriginalItemName('')
+            setOriginalValue(0)
+            setOriginalImage('')
+            setOriginalNpcNames([])
         }
     }, [isEditMode, itemToEdit])
+
+    // Check if there are any changes
+    const hasChanges = () => {
+        if (!editMode) return true // Always allow creation
+
+        const currentValue = Number(value) || 0
+        const currentNpcNames = npcNames.sort()
+        const originalNpcNamesSorted = originalNpcNames.sort()
+
+        return (
+            currentValue !== originalValue ||
+            imagePreview !== originalImage ||
+            JSON.stringify(currentNpcNames) !== JSON.stringify(originalNpcNamesSorted)
+        )
+    }
 
     // Handle INSERT key for edit mode
     useEffect(() => {
@@ -60,6 +84,9 @@ export function ItemCreateModal({ open, name, onClose, onCreated, isEditMode = f
                     setImagePreview(itemToEdit.imageBase64 || placeholderBase64)
                     setNpcNames(itemToEdit.npcNames.filter(name => name !== "Custom - No names were provided"))
                     setOriginalItemName(itemToEdit.name)
+                    setOriginalValue(itemToEdit.value)
+                    setOriginalImage(itemToEdit.imageBase64 || placeholderBase64)
+                    setOriginalNpcNames(itemToEdit.npcNames.filter(name => name !== "Custom - No names were provided"))
                     setEditMode(true)
                 }
             }
@@ -143,6 +170,9 @@ export function ItemCreateModal({ open, name, onClose, onCreated, isEditMode = f
         setNewNpcName('')
         setEditMode(false)
         setOriginalItemName('')
+        setOriginalValue(0)
+        setOriginalImage('')
+        setOriginalNpcNames([])
         onClose()
     }
 
@@ -239,9 +269,16 @@ export function ItemCreateModal({ open, name, onClose, onCreated, isEditMode = f
                         <p className="text-sm text-gray-500">No NPCs added. Item will be marked as "Custom".</p>
                     )}
                 </div>
+                {!editMode && (
+                    <div className="mb-4 p-2 bg-blue-50 border border-blue-200 rounded">
+                        <p className="text-sm text-blue-700">
+                            💡 <strong>Tip:</strong> Press <kbd className="px-1 py-0.5 bg-blue-100 border border-blue-300 rounded text-xs">INSERT</kbd> to edit this item if it already exists.
+                        </p>
+                    </div>
+                )}
                 <button
                     onClick={handleCreate}
-                    disabled={!value || isNaN(Number(value)) || Number(value) <= 0 || Number(value) > 10000000}
+                    disabled={!value || isNaN(Number(value)) || Number(value) <= 0 || Number(value) > 10000000 || (editMode && !hasChanges())}
                     className="create-button"
                 >
                     {editMode ? 'Update' : 'Create'}
