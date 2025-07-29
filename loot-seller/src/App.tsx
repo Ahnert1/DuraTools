@@ -598,9 +598,8 @@ function App() {
         return acc;
       }, {} as Record<string, ParsedRaid[]>);
 
-      // Sort locations alphabetically
+      // Sort locations by most recent raid time, then sort raids within each location by time
       return Object.entries(groupedRaids)
-        .sort(([locA], [locB]) => locA.localeCompare(locB))
         .map(([location, raids]) => ({
           location,
           raids: raids.sort((a, b) => {
@@ -608,7 +607,13 @@ function App() {
             const timeB = b.elapsedTime || 0;
             return timeA - timeB;
           })
-        }));
+        }))
+        .sort((a, b) => {
+          // Get the most recent raid time for each location (lowest elapsedTime)
+          const mostRecentTimeA = Math.min(...a.raids.map(raid => raid.elapsedTime || 0));
+          const mostRecentTimeB = Math.min(...b.raids.map(raid => raid.elapsedTime || 0));
+          return mostRecentTimeA - mostRecentTimeB;
+        });
     }
   }, [parsedRaids, raidViewMode]) as ParsedRaid[] | { location: string; raids: ParsedRaid[] }[];
 
@@ -688,8 +693,8 @@ function App() {
                     onChange={handleViewModeChange}
                     className="category-select"
                   >
-                    <option value="time">Sort by Time</option>
-                    <option value="location">Group by Location</option>
+                    <option value="time">Sort by Time (Any Location)</option>
+                    <option value="location">Group by Location (Most Recent First)</option>
                   </select>
                 </div>
                 {unmatchedLines.length > 0 && (
