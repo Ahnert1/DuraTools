@@ -318,6 +318,12 @@ const raidOverrides = {
     },
     "/view/durawiki/raids/edron-raids/edron-goblins": {
         firstMessage: "WALLACE: THE GOBLIN TRIBES MEET WITH THE CAVE TROLLS TO RAID THE CITIZENS OF EDRON FOR TASTY MAN FLESH!"
+    },
+    "/view/durawiki/raids/edron-raids/hives-honey": {
+        firstMessage: "WALLACE:  THE HIVE'S HONEY YIELD IS RIPE FOR HARVEST IN CORMAYA. THE BEARS AWAKEN AND SEEK TO SATISFY THEIR SNOUTS!"
+    },
+    "/view/durawiki/raids/ankrahmun-raids/khazeel-tar-oozes": {
+        firstMessage: "Kha'zeel is old and its sediments with it. The magic of Dragon and Djinn alike has seeped into the rocky ground over millenia. Spawned from within its mountain and caves come mindless and interminable horrors. To them rock and flesh are but the same; the bones of each victim become possessed by their trail."
     }
 };
 
@@ -326,19 +332,32 @@ const raidOverrides = {
  * These will be merged with scraped raids
  */
 const customRaids = [
-    // {
-    //     href: '/view/durawiki/raids/custom-raid',
-    //     name: 'Custom Raid Name',
-    //     firstMessage: 'Custom first message',
-    //     secondMessage: 'Custom second message',
-    //     thirdMessage: 'Custom third message',
-    //     bossMessage: 'Custom boss message',
-    //     location: 'Custom location',
-    //     mobs: ['Custom Mob 1', 'Custom Mob 2'],
-    //     bosses: ['Custom Boss'],
-    //     floors: ['1', '2'],
-    //     timeToSpawn: 'Custom spawn time'
-    // }
+    {
+        href: "Kepresh Slime Oozes",
+        name: "Kepresh Slime Oozes",
+        firstMessage: "The hourglass of a longforgotten vizier is knocked from its pedestal in the palace of Khepresh... Enchanted grains pour out from its broken neck and dissipate into the sandbar and moat below..",
+        secondMessage: "The vizier's curse is activated! The sands awaken with restless conviction to consume everything in their path.",
+        thirdMessage: "",
+        bossMessage: "",
+        location: "Khepresh(Torture Room, Delta)",
+        mobs: ["Slime Ooze"],
+        bosses: [],
+        floors: ["-4", "-5"],
+        timeToSpawn: "?"
+    },
+    {
+        href: "/view/durawiki/raids/venore-raids/flesh-of-women",
+        name: "Flesh of Women",
+        firstMessage: "The Orcs stream out of the forests and hills for the flesh of women!",
+        secondMessage: "",
+        thirdMessage: "",
+        bossMessage: "",
+        location: "Venore Amazon Camp",
+        mobs: ["Orc", "Orc Warrior", "Orc Shaman", "Orc Leader"],
+        bosses: [],
+        floors: ["Surface", "-1"],
+        timeToSpawn: "?"
+    }
 ];
 
 /**
