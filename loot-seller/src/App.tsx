@@ -497,34 +497,39 @@ function App() {
 
       let elapsedTime = 0;
 
-      // Extract explicit elapsed time if present
+      // Determine explicit elapsed time if present
       const explicitTimeMatch = line.match(/\(\s*(\d+)\s+minutes?\s+ago\s*\)/i);
-      if (explicitTimeMatch) {
-        elapsedTime = parseInt(explicitTimeMatch[1]);
-      } else {
-        const timestampMatch = line.match(/^(\d{2}):(\d{2})\s+/);
+      // Determine timestamp at start of line if present
+      const timestampMatch = line.match(/^(\d{2}):(\d{2})\s+/);
 
-        if (timestampMatch) {
-          const hours = parseInt(timestampMatch[1]);
-          const minutes = parseInt(timestampMatch[2]);
+      let deltaFromTimestamp = 0;
+      if (timestampMatch) {
+        const hours = parseInt(timestampMatch[1]);
+        const minutes = parseInt(timestampMatch[2]);
 
-          // Calculate elapsed time based on current time
-          const now = new Date();
-          const currentHours = now.getHours();
-          const currentMinutes = now.getMinutes();
+        // Calculate elapsed time based on current time
+        const now = new Date();
+        const currentHours = now.getHours();
+        const currentMinutes = now.getMinutes();
 
-          // Calculate total minutes for both times
-          const raidTimeMinutes = hours * 60 + minutes;
-          const currentTimeMinutes = currentHours * 60 + currentMinutes;
+        // Calculate total minutes for both times
+        const raidTimeMinutes = hours * 60 + minutes;
+        const currentTimeMinutes = currentHours * 60 + currentMinutes;
 
-          // Calculate difference (handle day wrap-around)
-          let timeDiff = currentTimeMinutes - raidTimeMinutes;
-          if (timeDiff < 0) {
-            timeDiff += 24 * 60; // Add 24 hours if negative (next day)
-          }
-
-          elapsedTime = timeDiff;
+        // Calculate difference (handle day wrap-around)
+        deltaFromTimestamp = currentTimeMinutes - raidTimeMinutes;
+        if (deltaFromTimestamp < 0) {
+          deltaFromTimestamp += 24 * 60; // Add 24 hours if negative (next day)
         }
+      }
+
+      if (explicitTimeMatch) {
+        const explicitMinutes = parseInt(explicitTimeMatch[1]);
+        // If both explicit and timestamp exist, add them to account for old logs
+        elapsedTime = explicitMinutes + deltaFromTimestamp;
+      } else if (timestampMatch) {
+        // Only timestamp present
+        elapsedTime = deltaFromTimestamp;
       }
 
 
@@ -535,9 +540,11 @@ function App() {
         .replace(/^\d{2}:\d{2}\s+/, '') // Remove timestamp
         .replace(/\(\s*(\d+)\s+minutes?\s+ago\s*\)/i, '') // Remove elapsed time
         .trim()
-        .replace(/\u00A0/g, ' ')
+        .replace(/\u00A0/g, ' ') // Normalize NBSP
+        .replace(/\s+/g, ' '); // Collapse excessive whitespace
 
       // Find matching raid
+      const normalizedCleanLine = cleanLine.toLowerCase();
       const matchingRaid = raidData.find(raid => {
         const messages = [
           raid.firstMessage,
@@ -545,7 +552,7 @@ function App() {
         ].filter(Boolean);
 
         return messages.some(message =>
-          message.toLowerCase().includes(cleanLine.toLowerCase())
+          normalizedCleanLine.includes((message || '').replace(/\s+/g, ' ').toLowerCase())
         );
       });
 
@@ -564,7 +571,7 @@ function App() {
             raid.thirdMessage
           ].filter(Boolean);
           return messages.some(message =>
-            cleanLine.toLowerCase().includes(message.toLowerCase())
+            normalizedCleanLine.includes((message || '').replace(/\s+/g, ' ').toLowerCase())
           );
         });
         if (!matchingRaid) {
@@ -579,6 +586,26 @@ function App() {
 
   useEffect(() => {
     parseRaidLog(raidLogInput);
+  }, [raidLogInput]);
+
+  // Recalculate elapsed times every local minute so stale inputs keep updating
+  useEffect(() => {
+    if (!raidLogInput.trim()) return;
+
+    let intervalId: ReturnType<typeof setInterval> | undefined;
+    const recompute = () => parseRaidLog(raidLogInput);
+
+    const now = new Date();
+    const msUntilNextMinute = (60 - now.getSeconds()) * 1000 - now.getMilliseconds();
+    const timeoutId = setTimeout(() => {
+      recompute();
+      intervalId = setInterval(recompute, 60 * 1000);
+    }, Math.max(0, msUntilNextMinute));
+
+    return () => {
+      clearTimeout(timeoutId);
+      if (intervalId) clearInterval(intervalId);
+    };
   }, [raidLogInput]);
 
   const getSortedRaids = useMemo(() => {
@@ -615,7 +642,7 @@ function App() {
           return mostRecentTimeA - mostRecentTimeB;
         });
     }
-  }, [parsedRaids, raidViewMode]) as ParsedRaid[] | { location: string; raids: ParsedRaid[] }[];
+  }, [parsedRaids, raidViewMode, unmatchedLines]) as ParsedRaid[] | { location: string; raids: ParsedRaid[] }[];
 
   // Update the view mode handler to save to local storage
   const handleViewModeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -698,8 +725,15 @@ function App() {
                   </select>
                 </div>
                 {unmatchedLines.length > 0 && (
-                  <div className="unmatched-lines-message">
+                  <div className="unmatched-lines-message not-matched-message" role="status" aria-live="polite">
+                    <span className="xmark-circle" aria-hidden="true" />
                     {unmatchedLines.length} raid message(s) not matched to known raids.  Godlike will work on updating these!
+                  </div>
+                )}
+                {unmatchedLines.length === 0 && parsedRaids.length > 0 && (
+                  <div className="all-matched-message" role="status" aria-live="polite">
+                    <span className="checkmark-circle" aria-hidden="true" />
+                    All raid messages match to known raids
                   </div>
                 )}
               </div>
