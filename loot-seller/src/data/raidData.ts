@@ -1,5 +1,5 @@
 // This file is auto-generated. Do not edit manually.
-// Generated on: 2025-08-13T17:26:25.699Z
+// Generated on: 2025-08-21T02:02:28.386Z
 
 export interface Raid {
   href: string;
@@ -3306,7 +3306,7 @@ export const raidData: Raid[] = [
     "firstMessage": "The Dragons of Fibula are stirred from their slumbers by the hammers of the day and revelries of night, the minotaurs flee...",
     "secondMessage": "The noise of shields only rankles them further.",
     "thirdMessage": "",
-    "bossMessage": "A lord of the dragon tears out of the earth....\n        or\n        A lord of the dragon swirls his tail in lava....",
+    "bossMessage": "A lord of the dragon tears out of the earth.... \n\tor\n\tA lord of the dragon swirls his tail in lava....",
     "name": "Fibula Dragon Lords",
     "location": "Deeper Fibula",
     "mobs": [
@@ -4166,7 +4166,7 @@ export const raidData: Raid[] = [
   },
   {
     "href": "/view/durawiki/raids/venore-raids/poh-giant-spiders",
-    "firstMessage": "It is mating season for the spiders of the plains. Their numbers are about to multiply... Beware.",
+    "firstMessage": "It is mating season for the spiders of the plains. Their numbers are about to multiply... beware",
     "secondMessage": "",
     "thirdMessage": "",
     "bossMessage": "",
@@ -4545,11 +4545,11 @@ export const raidData: Raid[] = [
   },
   {
     "href": "/view/durawiki/raids/venore-raids/flesh-of-women",
+    "name": "Flesh of Women",
     "firstMessage": "The Orcs stream out of the forests and hills for the flesh of women!",
     "secondMessage": "",
     "thirdMessage": "",
     "bossMessage": "",
-    "name": "Flesh of Women",
     "location": "Venore Amazon Camp",
     "mobs": [
       "Orc",

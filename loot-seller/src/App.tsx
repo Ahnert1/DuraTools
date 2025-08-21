@@ -55,6 +55,7 @@ function App() {
     return (savedMode === 'time' || savedMode === 'location') ? savedMode : 'time';
   });
   const [unmatchedLines, setUnmatchedLines] = useState<{ line: string, elapsedTime: number }[]>([]);
+  const [animationKey, setAnimationKey] = useState(0);
 
   // Add new function to get random mob/item
   const getRandomMob = useCallback(() => {
@@ -588,6 +589,11 @@ function App() {
     parseRaidLog(raidLogInput);
   }, [raidLogInput]);
 
+  // Retrigger matched/unmatched animations on every raid log input change
+  useEffect(() => {
+    setAnimationKey(prev => prev + 1);
+  }, [raidLogInput]);
+
   // Recalculate elapsed times every local minute so stale inputs keep updating
   useEffect(() => {
     if (!raidLogInput.trim()) return;
@@ -725,13 +731,13 @@ function App() {
                   </select>
                 </div>
                 {unmatchedLines.length > 0 && (
-                  <div className="unmatched-lines-message not-matched-message" role="status" aria-live="polite">
+                  <div key={`unmatched-${animationKey}`} className="unmatched-lines-message not-matched-message" role="status" aria-live="polite">
                     <span className="xmark-circle" aria-hidden="true" />
                     {unmatchedLines.length} raid message(s) not matched to known raids.  Godlike will work on updating these!
                   </div>
                 )}
                 {unmatchedLines.length === 0 && parsedRaids.length > 0 && (
-                  <div className="all-matched-message" role="status" aria-live="polite">
+                  <div key={`matched-${animationKey}`} className="all-matched-message" role="status" aria-live="polite">
                     <span className="checkmark-circle" aria-hidden="true" />
                     All raid messages match to known raids
                   </div>
