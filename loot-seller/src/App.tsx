@@ -1042,7 +1042,7 @@ function App() {
       <div style={{ position: "absolute", height: "100px" }} ref={bottomOfTable} />
 
 
-      {totalValue > 0 && (
+      {activeTab === 'calculator' && totalValue > 0 && (
         <div className="total-footer">
           <div className="total-gold-container">
             {floatingValues.map(({ id, value, isPositive }) => (

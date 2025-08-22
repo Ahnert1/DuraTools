@@ -1,5 +1,5 @@
 // This file is auto-generated. Do not edit manually.
-// Generated on: 2025-08-21T02:02:28.386Z
+// Generated on: 2025-08-22T05:21:08.526Z
 
 export interface Raid {
   href: string;
@@ -130,10 +130,10 @@ export const raidData: Raid[] = [
   },
   {
     "href": "/view/durawiki/raids/abdendriel-raids/draconia-dragons",
-    "firstMessage": "",
-    "secondMessage": "",
+    "firstMessage": "The numbers are returning to Draconia, the city is wreathed not in carcasses but wing and flame once again...",
+    "secondMessage": "Red hides walk the shores... the sea breezes have let the dragons live into deep age.",
     "thirdMessage": "",
-    "bossMessage": "The numbers are returning to Draconia, the city is wreathed not in carcasses but wing and flame once again...",
+    "bossMessage": "The shores seem once again rich enough to deserve his presence.",
     "name": "Draconia Dragons",
     "location": "Draconia",
     "mobs": [

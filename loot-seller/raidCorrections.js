@@ -75,6 +75,12 @@ const raidOverrides = {
     },
     "/view/durawiki/raids/venore-raids/poh-giant-spiders": {
         firstMessage: "It is mating season for the spiders of the plains. Their numbers are about to multiply... beware",
+    },
+    "/view/durawiki/raids/abdendriel-raids/draconia-dragons":
+    {
+        firstMessage: "The numbers are returning to Draconia, the city is wreathed not in carcasses but wing and flame once again...",
+        secondMessage: "Red hides walk the shores... the sea breezes have let the dragons live into deep age.",
+        bossMessage: "The shores seem once again rich enough to deserve his presence."
     }
 };
 

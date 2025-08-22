@@ -99,7 +99,6 @@ select.category-select {
 }
 
 button {
-  
   padding: 10px 16px;
   border: none;
   border-radius: 4px;
@@ -857,8 +856,6 @@ button:disabled {
 .form-group input:focus,
 .form-group select:focus {
   outline: none;
-  border-color: #4CAF50;
-  box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
 }
 
 .search-form button {
