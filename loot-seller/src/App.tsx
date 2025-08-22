@@ -713,7 +713,7 @@ function App() {
                         console.error('Failed to read clipboard:', err);
                       }
                     }}
-                    className="mt-2"
+                    className="mt-2 transition-transform active:translate-y-[2px] active:scale-[0.99]"
                   >
                     Paste from Clipboard
                   </button>
