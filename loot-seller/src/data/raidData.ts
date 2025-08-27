@@ -1,5 +1,5 @@
 // This file is auto-generated. Do not edit manually.
-// Generated on: 2025-08-22T05:21:08.526Z
+// Generated on: 2025-08-27T02:42:48.381Z
 
 export interface Raid {
   href: string;
@@ -2044,10 +2044,10 @@ export const raidData: Raid[] = [
   },
   {
     "href": "/view/durawiki/raids/edron-raids/dragon-lords-in-cyclopolis",
-    "firstMessage": "The Dragon Lords convene with the Behemoths; cunning with strength ...the air shrieks with fire and the ground rumbles with the steps of giants.",
+    "firstMessage": "The Dragon Lords convene with the Behemoths; cunning with strength. ...the air shrieks with fire and the ground rumbles with the steps of giants.",
     "secondMessage": "",
     "thirdMessage": "",
-    "bossMessage": "The Dragon Lords convene with the Behemoths; cunning with strenght... The air shrieks with fire and the ground rumbles with the steps of giants...",
+    "bossMessage": "A monster reveals itself that gives terror to even the Lords of the Dragons...",
     "name": "Dragon Lords in Cyclopolis",
     "location": "Cyclopolis",
     "mobs": [

@@ -3,4 +3,5 @@ export interface ParsedRaid {
     mobs: string[];
     elapsedTime: number;
     location: string;
+    hasBossMessage: boolean;
 }

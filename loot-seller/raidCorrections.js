@@ -81,6 +81,11 @@ const raidOverrides = {
         firstMessage: "The numbers are returning to Draconia, the city is wreathed not in carcasses but wing and flame once again...",
         secondMessage: "Red hides walk the shores... the sea breezes have let the dragons live into deep age.",
         bossMessage: "The shores seem once again rich enough to deserve his presence."
+    },
+    "/view/durawiki/raids/edron-raids/dragon-lords-in-cyclopolis":
+    {
+        firstMessage: "The Dragon Lords convene with the Behemoths; cunning with strength. ...the air shrieks with fire and the ground rumbles with the steps of giants.",
+        bossMessage: "A monster reveals itself that gives terror to even the Lords of the Dragons..."
     }
 };
 

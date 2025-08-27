@@ -546,10 +546,46 @@ function App() {
 
       // Find matching raid
       const normalizedCleanLine = cleanLine.toLowerCase();
+
+      // First: detect boss messages explicitly
+      const bossMatch = raidData.find(raid => {
+        const messages = [
+          raid.bossMessage
+        ].filter(Boolean);
+
+        return messages.some(message =>
+          normalizedCleanLine.includes((message || '').replace(/\s+/g, ' ').toLowerCase())
+        );
+      });
+
+      if (bossMatch) {
+        // Attach boss flag to the most recent occurrence of this raid if present
+        const reverseIndex = [...raids].reverse().findIndex(r => r.name === bossMatch.name);
+        if (reverseIndex !== -1) {
+          const originalIndex = raids.length - 1 - reverseIndex;
+          if (!raids[originalIndex].hasBossMessage) {
+            raids[originalIndex] = {
+              ...raids[originalIndex],
+              hasBossMessage: true
+            };
+          }
+        } else {
+          // If no prior occurrence exists, create a new entry with boss flag
+          raids.push({
+            name: bossMatch.name,
+            mobs: bossMatch.mobs,
+            elapsedTime: elapsedTime,
+            location: bossMatch.location,
+            hasBossMessage: true
+          });
+        }
+        return; // proceed to next line
+      }
+
+      // Next: detect first messages (standard start of raid)
       const matchingRaid = raidData.find(raid => {
         const messages = [
-          raid.firstMessage,
-          raid.bossMessage
+          raid.firstMessage
         ].filter(Boolean);
 
         return messages.some(message =>
@@ -562,14 +598,16 @@ function App() {
           name: matchingRaid.name,
           mobs: matchingRaid.mobs,
           elapsedTime: elapsedTime,
-          location: matchingRaid.location
+          location: matchingRaid.location,
+          hasBossMessage: false
         });
       } else {
         // Check if no second/third message match, and report errors
         const matchingRaid = raidData.find(raid => {
           const messages = [
             raid.secondMessage,
-            raid.thirdMessage
+            raid.thirdMessage,
+            raid.bossMessage
           ].filter(Boolean);
           return messages.some(message =>
             normalizedCleanLine.includes((message || '').replace(/\s+/g, ' ').toLowerCase())
@@ -581,6 +619,7 @@ function App() {
       }
     });
 
+    // Preserve multiple occurrences; boss messages augment the applicable occurrence only
     setParsedRaids(raids);
     setUnmatchedLines(unmatchedLines);
   };
@@ -616,14 +655,14 @@ function App() {
 
   const getSortedRaids = useMemo(() => {
     if (raidViewMode === 'time') {
-      return [...parsedRaids, ...unmatchedLines.map(u => ({ name: u.line, mobs: [], elapsedTime: u.elapsedTime }))].sort((a, b) => {
+      return [...parsedRaids, ...unmatchedLines.map(u => ({ name: u.line, mobs: [], elapsedTime: u.elapsedTime, location: '', hasBossMessage: false }))].sort((a, b) => {
         const timeA = a.elapsedTime || 0;
         const timeB = b.elapsedTime || 0;
         return timeA - timeB;
       });
     } else {
       // Group by location
-      const groupedRaids = [...parsedRaids, ...unmatchedLines.map(u => ({ name: u.line, location: "Unknown", mobs: [], elapsedTime: u.elapsedTime }))].reduce((acc, raid) => {
+      const groupedRaids = [...parsedRaids, ...unmatchedLines.map(u => ({ name: u.line, location: "Unknown", mobs: [], elapsedTime: u.elapsedTime, hasBossMessage: false }))].reduce((acc, raid) => {
         if (!acc[raid.location]) {
           acc[raid.location] = [];
         }
@@ -759,7 +798,7 @@ function App() {
                     {raidViewMode === 'time' ? (
                       // Time-based view
                       (getSortedRaids as ParsedRaid[]).map((raid: ParsedRaid, index: number) => (
-                        <tr key={index}>
+                        <tr key={index} className={raid.hasBossMessage ? 'boss-glow' : ''}>
                           <td style={{ maxWidth: '200px' }}>
                             <RaidTooltip raidName={raid.mobs.length ? raid.name : "?"} />
                           </td>
@@ -786,7 +825,7 @@ function App() {
                             </td>
                           </tr>
                           {raids.map((raid: ParsedRaid, index: number) => (
-                            <tr key={`${location}-${index}`}>
+                            <tr key={`${location}-${index}`} className={raid.hasBossMessage ? 'boss-glow' : ''}>
                               <td style={{ maxWidth: '200px' }}>
                                 <RaidTooltip raidName={raid.mobs.length ? raid.name : "?"} />
                               </td>

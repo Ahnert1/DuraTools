@@ -1278,3 +1278,23 @@ button:disabled {
   padding-bottom: 3px;
   border-bottom: 2px solid #000000;
 }
+
+/* Boss message glow effect */
+.boss-glow {
+  position: relative;
+  border: 1px solid rgba(255, 215, 0, 0.8) !important;
+  box-shadow: 0 0 8px rgba(255, 215, 0, 0.7), 0 0 16px rgba(255, 215, 0, 0.5);
+  animation: boss-gold-pulse 1.8s ease-in-out infinite;
+}
+
+@keyframes boss-gold-pulse {
+  0% {
+    box-shadow: 0 0 6px rgba(255, 215, 0, 0.5), 0 0 12px rgba(255, 215, 0, 0.35);
+  }
+  50% {
+    box-shadow: 0 0 14px rgba(255, 215, 0, 0.9), 0 0 28px rgba(255, 215, 0, 0.65);
+  }
+  100% {
+    box-shadow: 0 0 6px rgba(255, 215, 0, 0.5), 0 0 12px rgba(255, 215, 0, 0.35);
+  }
+}
