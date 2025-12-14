@@ -198,7 +198,7 @@ function App() {
 
   // Handle search input change
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const query = e.target.value.trim().slice(0, 30);
+    const query = e.target.value.slice(0, 30);
     setSearchQuery(query);
 
     if (query !== selectedItem?.name) {
@@ -772,13 +772,19 @@ function App() {
                 {unmatchedLines.length > 0 && (
                   <div key={`unmatched-${animationKey}`} className="unmatched-lines-message not-matched-message" role="status" aria-live="polite">
                     <span className="xmark-circle" aria-hidden="true" />
-                    {unmatchedLines.length} raid message(s) not matched to known raids.  Godlike will work on updating these!
+                    {unmatchedLines.length} raid message{unmatchedLines.length > 1 && "s"} not matched to known raids
                   </div>
                 )}
-                {unmatchedLines.length === 0 && parsedRaids.length > 0 && (
+                {parsedRaids.length > 0 && (
                   <div key={`matched-${animationKey}`} className="all-matched-message" role="status" aria-live="polite">
                     <span className="checkmark-circle" aria-hidden="true" />
-                    All raid messages match to known raids
+                    {parsedRaids.length} raid{parsedRaids.length > 1 && "s"} parsed successfully from raid log
+                  </div>
+                )}
+                {parsedRaids.some(x => x.hasBossMessage) && (
+                  <div key={`boss-message-${animationKey}`} className="boss-message-message" role="status" aria-live="polite">
+                    <span className="star-circle" aria-hidden="true" />
+                    {parsedRaids.filter(x => x.hasBossMessage).length} raid{parsedRaids.filter(x => x.hasBossMessage).length > 1 && "s"} with a potential boss!
                   </div>
                 )}
               </div>

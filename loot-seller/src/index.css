@@ -1169,6 +1169,21 @@ button:disabled {
   font-weight: 600;
 }
 
+.boss-message-message {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  color: #8a6d00; /* deep gold-ish text */
+  background: rgba(255, 215, 0, 0.15); /* subtle gold background */
+  border: 1px solid rgba(255, 215, 0, 0.7); /* gold border similar to boss-glow */
+  border-radius: 6px;
+  padding: 0.5rem 0.75rem;
+  font-weight: 600;
+  position: relative;
+  overflow: visible; /* prevent slam animation from being clipped */
+}
+
 .checkmark-circle {
   display: inline-flex;
   align-items: center;
@@ -1186,6 +1201,27 @@ button:disabled {
 .checkmark-circle::before {
   content: '✓';
   font-size: 18px;
+  line-height: 1;
+}
+
+.star-circle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  min-width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background-color: #FFD700; /* gold */
+  color: #ffffff;
+  transform-origin: center;
+  animation: check-slam 650ms cubic-bezier(0.2, 0.8, 0.2, 1) 1 both;
+  position: relative;
+}
+
+.star-circle::before {
+  content: '★';
+  font-size: 16px;
   line-height: 1;
 }
 

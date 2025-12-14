@@ -115,7 +115,20 @@ const customRaids = [
         bosses: [],
         floors: ["Surface", "-1"],
         timeToSpawn: "?"
-    }
+    },
+    {
+        href: "Mystic Infiltration",
+        name: "Mystic Infiltration",
+        firstMessage: "In a vaulted room where the very world of Dura is depicted in grains of sand and tile beneath the wizards' feet, the elements of the earth animate in answer to their new visitors.",
+        secondMessage: "A group of mystic masters have infiltrated Khepresh, seeking to unlock its secrets.",
+        thirdMessage: "",
+        bossMessage: "",
+        location: "Khepresh(Map Room)",
+        mobs: ["Warlock, Pharaoh, Slime Ooze"],
+        bosses: [],
+        floors: ["-4", "-5", "-6"],
+        timeToSpawn: "?"
+    },
 ];
 
 module.exports = {
