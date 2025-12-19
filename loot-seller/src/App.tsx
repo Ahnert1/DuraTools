@@ -885,7 +885,7 @@ function App() {
                   className="w-6 h-6 object-contain"
                   onError={handleImageError}
                 />
-                Sell Loot by NPC
+                NPC Item List
               </div>
             </TabsTrigger>
           </TabsList>
@@ -1357,7 +1357,11 @@ function App() {
                               const isSelectedItem = selectedNpcItemFilter?.type === 'item'
                                 && it.name.toLowerCase() === selectedNpcItemFilter.value.toLowerCase();
                               return (
-                                <div key={`${npc}-${it.name}`} className={`npc-item-chip${isSelectedItem ? ' npc-item-chip--highlight' : ''}`}>
+                                <div
+                                  key={`${npc}-${it.name}`}
+                                  className={`npc-item-chip${isSelectedItem ? ' npc-item-chip--highlight' : ''}`}
+                                  data-value={`${getDisplayValue(it.value)} gp`}
+                                >
                                   <img
                                     src={it.imageBase64 || placeholderBase64}
                                     alt={it.name}

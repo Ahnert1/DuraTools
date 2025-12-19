@@ -930,6 +930,8 @@ body.dark {
   border-radius: 8px;
   background: #fff;
   white-space: nowrap;
+  position: relative;
+  cursor: help; /* info cursor */
 }
 .dark .npc-item-chip {
   border-color: #1f2937;
@@ -943,6 +945,46 @@ body.dark {
 .dark .npc-item-chip--highlight {
   border-color: #10b981; /* green-500 */
   box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.35);
+}
+
+.npc-item-chip:hover {
+  border-color: #3b82f6; /* blue-500 */
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.25);
+}
+.dark .npc-item-chip:hover {
+  border-color: #60a5fa; /* blue-400 */
+  box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.3);
+}
+
+/* Instant tooltip for item value on hover */
+.npc-item-chip::after {
+  content: attr(data-value);
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%) translateY(0);
+  background: #ffffff;
+  color: #111827;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  padding: 6px 8px;
+  font-size: 14px;
+  line-height: 1.1;
+  white-space: nowrap;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.12);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 80ms ease-out;
+  z-index: 20;
+}
+.npc-item-chip:hover::after {
+  opacity: 1;
+}
+.dark .npc-item-chip::after {
+  background: #111827;
+  color: #e5e7eb;
+  border-color: #374151;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.35);
 }
 .dark .search-results:not(.grid-view) .item-details .gold-text {
   color: #ffffff;              /* make item value white in dark mode (list view) */
