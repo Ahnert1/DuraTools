@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import Fuse from 'fuse.js';
-import { lootItems } from './data/itemDataMultiNpc';
+import { lootItems, ItemData } from './data/itemDataMultiNpc';
 import { ExtendedItemData } from './models/ExtendedItemData';
 import { handleImageError } from './utils/imageUtils';
 import { CATEGORIES } from './enums/Categories';
@@ -56,6 +56,13 @@ function App() {
   });
   const [unmatchedLines, setUnmatchedLines] = useState<{ line: string, elapsedTime: number }[]>([]);
   const [animationKey, setAnimationKey] = useState(0);
+  // Sell-by-NPC filter + selection
+  const [npcItemFilter, setNpcItemFilter] = useState('');
+  const [showNpcItemSuggestions, setShowNpcItemSuggestions] = useState(false);
+  const [selectedNpcItemFilter, setSelectedNpcItemFilter] = useState<null | { type: 'npc' | 'item'; value: string }>(null);
+  const npcFilterContainerRef = useRef<HTMLDivElement>(null);
+  const npcFilterInputRef = useRef<HTMLInputElement>(null);
+  const [isNpcFilterFocused, setIsNpcFilterFocused] = useState(false);
 
   // Add new function to get random mob/item
   const getRandomMob = useCallback(() => {
@@ -68,9 +75,36 @@ function App() {
     return lootItems[randomIndex];
   }, []);
 
-  // Add state for random mob/item
-  const [randomMob] = useState(getRandomMob);
-  const [randomItem] = useState(getRandomItem);
+  // Add state for random mob/item (will rotate periodically)
+  const [randomMob, setRandomMob] = useState(getRandomMob);
+  const [randomItem, setRandomItem] = useState(getRandomItem);
+
+  // Rotate tab icons at a cadence similar to the crystal coin (8 frames ~ 800ms)
+  useEffect(() => {
+    const ICON_CYCLE_MS = 500;
+    const intervalId = setInterval(() => {
+      setRandomMob(prev => {
+        const prevName = prev?.name;
+        let next = getRandomMob();
+        // try to avoid repeating the exact same mob consecutively
+        for (let i = 0; i < 3 && next?.name === prevName; i++) {
+          next = getRandomMob();
+        }
+        return next;
+      });
+      setRandomItem(prev => {
+        const prevName = prev?.name;
+        let next = getRandomItem();
+        // try to avoid repeating the exact same item consecutively
+        for (let i = 0; i < 3 && next?.name === prevName; i++) {
+          next = getRandomItem();
+        }
+        return next;
+      });
+    }, ICON_CYCLE_MS);
+
+    return () => clearInterval(intervalId);
+  }, [getRandomMob, getRandomItem]);
 
   useEffect(() => {
     setCustomItems(getCustomItems())
@@ -466,6 +500,32 @@ function App() {
     return '';
   }
 
+  // Format locations for display:
+  // - Insert a space before '(' when missing, e.g., "Khepresh(Royal...)" -> "Khepresh (Royal ...)"
+  // - Split concatenated multi-locations like "Jakundaf DesertHero Cave" into ["Jakundaf Desert", "Hero Cave"]
+  function getLocationLines(rawLocation?: string): string[] {
+    if (!rawLocation) return [];
+    const normalized = rawLocation
+      .trim()
+      .replace(/([A-Za-z])\(/g, '$1 ('); // ensure space before '('
+
+    // Split at boundaries where a lowercase letter or ')' is immediately followed by an uppercase letter
+    const parts = normalized.split(/(?<=[a-z\)])(?=[A-Z])/g).map(p => p.trim()).filter(Boolean);
+    return parts.length > 0 ? parts : [normalized];
+  }
+
+  function renderLocation(rawLocation?: string) {
+    const lines = getLocationLines(rawLocation);
+    if (lines.length === 0) return null;
+    return (
+      <div>
+        {lines.map((line, idx) => (
+          <div key={`${line}-${idx}`}>{line}</div>
+        ))}
+      </div>
+    );
+  }
+
   // Close search results when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -696,28 +756,118 @@ function App() {
     localStorage.setItem('raidViewMode', newMode);
   };
 
+  // Close Sell-by-NPC suggestions on outside click or ESC
+  useEffect(() => {
+    const onDocMouseDown = (e: MouseEvent) => {
+      if (!npcFilterContainerRef.current) return;
+      if (!npcFilterContainerRef.current.contains(e.target as Node)) {
+        setShowNpcItemSuggestions(false);
+      }
+    };
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setShowNpcItemSuggestions(false);
+      }
+    };
+    document.addEventListener('mousedown', onDocMouseDown);
+    document.addEventListener('keydown', onKeyDown);
+    return () => {
+      document.removeEventListener('mousedown', onDocMouseDown);
+      document.removeEventListener('keydown', onKeyDown);
+    };
+  }, []);
+
+  // Build NPC -> { locations, items } map for Sell-by-NPC tab
+  const npcToInfo = useMemo(() => {
+    function normalizeLocationToken(token: string): string {
+      const t = token.trim();
+      if (!t) return '';
+      // Title-case words while preserving apostrophes and spaces
+      return t
+        .split(/(\s|')/g)
+        .map(part => /^[A-Za-z]+$/.test(part) ? part.charAt(0).toUpperCase() + part.slice(1).toLowerCase() : part)
+        .join('');
+    }
+
+    function extractLocationTokens(raw: string): string[] {
+      // Split composite locations like "Ankrahmun/Kazordoon" or with accidental double slashes
+      return raw
+        .split(/[\/|]/g)
+        .map(normalizeLocationToken)
+        .filter(Boolean);
+    }
+
+    const map = new Map<string, { locations: Set<string>; items: ItemData[] }>();
+    lootItems.forEach((item) => {
+      (item.npcNames || []).forEach((rawNpc) => {
+        const npcBase = (rawNpc.split('(')[0] || rawNpc).trim();
+        const locationMatch = rawNpc.match(/\((.*?)\)/);
+        const rawLocation = locationMatch ? locationMatch[1].trim() : '';
+        if (!npcBase) return;
+        if (!map.has(npcBase)) map.set(npcBase, { locations: new Set<string>(), items: [] });
+        const info = map.get(npcBase)!;
+        if (rawLocation) {
+          extractLocationTokens(rawLocation).forEach(loc => info.locations.add(loc));
+        }
+        info.items.push(item);
+      });
+    });
+    return map;
+  }, []);
+
+  const filteredNpcEntries = useMemo(() => {
+    const entries = Array.from(npcToInfo.entries())
+      .map(([npc, info]) => ({ npc, locations: Array.from(info.locations), items: info.items }))
+      .sort((a, b) => a.npc.localeCompare(b.npc));
+
+    // Only filter when a suggestion is selected; free-typing doesn't filter
+    if (!selectedNpcItemFilter) return entries;
+    if (selectedNpcItemFilter.type === 'npc') {
+      return entries.filter(e => e.npc.toLowerCase() === selectedNpcItemFilter.value.toLowerCase());
+    }
+    // item filter - include NPCs that buy this item, but keep all items visible
+    const target = selectedNpcItemFilter.value.toLowerCase();
+    return entries.filter(e => e.items.some(it => it.name.toLowerCase() === target));
+  }, [npcToInfo, selectedNpcItemFilter]);
+
+  // Suggestions for filter (NPCs and Items) - shown when typing
+  const npcItemSuggestions = useMemo(() => {
+    const q = npcItemFilter.trim().toLowerCase();
+    if (q.length < 1) return [];
+    const npcNames = Array.from(npcToInfo.keys())
+      .filter(npc => npc.toLowerCase().includes(q))
+      .slice(0, 8)
+      .map(name => ({ type: 'npc' as const, name }));
+    const itemNames = lootItems
+      .map(it => it.name)
+      .filter((name, idx, arr) => arr.indexOf(name) === idx)
+      .filter(name => name.toLowerCase().includes(q))
+      .slice(0, 8)
+      .map(name => ({ type: 'item' as const, name }));
+    return [...npcNames, ...itemNames];
+  }, [npcItemFilter, npcToInfo]);
+
   return (
     <div className="container">
       <div className="header-collage-mobile">
         <HeaderCollage activeTab={activeTab} />
       </div>
-      <Tabs defaultValue="raids" onValueChange={handleTabChange}>
+      <Tabs defaultValue="raids" onValueChange={handleTabChange} orientation="vertical">
         <div className="tabs-container">
-          <TabsList className="flex gap-10">
-            <TabsTrigger value="raids" className={`flex items-center gap-2 `}>
-              <div className={`flex items-center gap-2 ${activeTab === 'raids' ? 'selected-tab' : ''}`}>
+          <TabsList className="flex flex-col h-[140px] w-[160px] justify-center gap-3">
+            <TabsTrigger value="raids" className={`flex items-center gap-2 w-full justify-start`}>
+              <div className={`flex items-center gap-2 w-full ${activeTab === 'raids' ? 'selected-tab-vertical' : ''}`}>
                 <img
                   src={randomMob.imageBase64 || placeholderBase64}
                   alt={randomMob.name}
-                  className="w-6 h-6 object-contain"
+                  className="w-8 h-8 object-contain"
                   onError={handleImageError}
                 />
                 Raids
               </div>
             </TabsTrigger>
-            <div style={{ width: '80%' }} />
-            <TabsTrigger value="calculator" className={`flex items-center gap-2`}>
-              <div className={`flex items-center gap-2 ${activeTab === 'calculator' ? 'selected-tab' : ''}`}>
+            <TabsTrigger value="calculator" className={`flex items-center gap-2 w-full justify-start`}>
+              <div className={`flex items-center gap-2 w-full ${activeTab === 'calculator' ? 'selected-tab-vertical' : ''}`}>
                 <img
                   src={randomItem.imageBase64 || placeholderBase64}
                   alt={randomItem.name}
@@ -725,6 +875,17 @@ function App() {
                   onError={handleImageError}
                 />
                 Calculator
+              </div>
+            </TabsTrigger>
+            <TabsTrigger value="sell-by-npc" className={`flex items-center gap-2 w-full justify-start`}>
+              <div className={`flex items-center gap-2 w-full ${activeTab === 'sell-by-npc' ? 'selected-tab-vertical' : ''}`}>
+                <img
+                  src={'/images/items/crystal-coin.gif'}
+                  alt="Crystal Coin"
+                  className="w-6 h-6 object-contain"
+                  onError={handleImageError}
+                />
+                Sell Loot by NPC
               </div>
             </TabsTrigger>
           </TabsList>
@@ -815,7 +976,7 @@ function App() {
                               )) : raid.name}
                             </div>
                           </td>
-                          {raid.location && <td>{raid.location}</td>}
+                          {raid.location && <td>{renderLocation(raid.location)}</td>}
                           <td>{raid.elapsedTime ? (raid.elapsedTime > 60
                             ? `${Math.floor(raid.elapsedTime / 60)} hours and ${raid.elapsedTime % 60} minutes ago`
                             : `${raid.elapsedTime} minutes ago`) : 'Now'}</td>
@@ -827,7 +988,7 @@ function App() {
                         <React.Fragment key={location}>
                           <tr className="bg-gray-100">
                             <td colSpan={4} className="font-bold text-lg py-2">
-                              {location}
+                              {renderLocation(location)}
                             </td>
                           </tr>
                           {raids.map((raid: ParsedRaid, index: number) => (
@@ -1079,6 +1240,140 @@ function App() {
                     Add your loot to view it here
                   </div>
                 )}
+              </div>
+            </div>
+          </div>
+        </TabsContent>
+        <TabsContent value="sell-by-npc">
+          <div className="main-content">
+            <div className="form-section">
+              <div className="search-form">
+                <div className="form-group">
+                  <label>Filter</label>
+                  <div style={{ position: 'relative' }} ref={npcFilterContainerRef}>
+                    <input
+                      ref={npcFilterInputRef}
+                      type="text"
+                      placeholder="Type to search NPCs or Items..."
+                      value={npcItemFilter}
+                      onChange={(e) => {
+                        const v = e.target.value;
+                        setNpcItemFilter(v);
+                        setShowNpcItemSuggestions(v.trim().length >= 1);
+                        if (v.trim().length === 0) {
+                          setSelectedNpcItemFilter(null);
+                        }
+                      }}
+                      onFocus={() => {
+                        setIsNpcFilterFocused(true);
+                        setShowNpcItemSuggestions(npcItemFilter.trim().length >= 1);
+                      }}
+                      onBlur={() => setIsNpcFilterFocused(false)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Escape') {
+                          e.preventDefault();
+                          setNpcItemFilter('');
+                          setSelectedNpcItemFilter(null);
+                          setShowNpcItemSuggestions(false);
+                          requestAnimationFrame(() => npcFilterInputRef.current?.focus());
+                        }
+                      }}
+                      autoComplete="off"
+                    />
+                    {npcItemFilter.trim().length > 0 && isNpcFilterFocused && (
+                      <span className="search-results-esc-tip">Press ESC to clear</span>
+                    )}
+                    {npcItemFilter.trim().length > 0 && (
+                      <button
+                        type="button"
+                        className="input-clear-btn"
+                        onClick={() => {
+                          setNpcItemFilter('');
+                          setSelectedNpcItemFilter(null);
+                          setShowNpcItemSuggestions(false);
+                          requestAnimationFrame(() => npcFilterInputRef.current?.focus());
+                        }}
+                        aria-label="Clear filter"
+                        title="Clear"
+                      >
+                        ✕
+                      </button>
+                    )}
+                    {showNpcItemSuggestions && npcItemSuggestions.length > 0 && (
+                      <div
+                        className="search-results grid-view overlay"
+                        style={{ position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 50 }}
+                      >
+                        {npcItemSuggestions.map((sug, idx) => (
+                          <div
+                            key={`${sug.type}-${sug.name}-${idx}`}
+                            className="search-result-item"
+                            onClick={() => {
+                              setSelectedNpcItemFilter({ type: sug.type, value: sug.name });
+                              setNpcItemFilter(sug.name);
+                              setShowNpcItemSuggestions(false);
+                            }}
+                            title={sug.type === 'npc' ? 'NPC' : 'Item'}
+                          >
+                            <div
+                              className="item-bg"
+                              style={{ backgroundImage: `url('${sug.type === 'item' ? (lootItems.find(it => it.name === sug.name)?.imageBase64 || placeholderBase64) : placeholderBase64}')` }}
+                            />
+                            <div className="item-content">
+                              <div className="item-value">{sug.type === 'npc' ? 'NPC' : 'Item'}</div>
+                              <div className="item-name">{sug.name}</div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div style={{ width: '100%' }}>
+              <div className="inventory-section">
+                <table className="item-table">
+                  <thead>
+                    <tr>
+                      <th style={{ minWidth: '240px', width: '240px' }}>NPC</th>
+                      <th style={{ width: '100%' }}>Items</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredNpcEntries.map(({ npc, locations, items }) => (
+                      <tr key={npc}>
+                        <td style={{ fontWeight: 600 }}>
+                          {npc}
+                          {locations && locations.length > 0 && (
+                            <div style={{ fontWeight: 400, fontSize: '0.85rem', color: '#6b7280' }}>
+                              ({locations.join(' | ')})
+                            </div>
+                          )}
+                        </td>
+                        <td>
+                          <div className="npc-items-row">
+                            {items.map((it) => {
+                              const isSelectedItem = selectedNpcItemFilter?.type === 'item'
+                                && it.name.toLowerCase() === selectedNpcItemFilter.value.toLowerCase();
+                              return (
+                                <div key={`${npc}-${it.name}`} className={`npc-item-chip${isSelectedItem ? ' npc-item-chip--highlight' : ''}`}>
+                                  <img
+                                    src={it.imageBase64 || placeholderBase64}
+                                    alt={it.name}
+                                    className="w-6 h-6 object-contain"
+                                    onError={handleImageError}
+                                  />
+                                  <span>{it.name}</span>
+                                </div>
+                              )
+                            })}
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             </div>
           </div>
