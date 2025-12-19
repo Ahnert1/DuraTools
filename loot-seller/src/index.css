@@ -976,6 +976,18 @@ body.dark {
   border-top-color: #1f2937;
 }
 
+/* Raid locations row (group headers) - dark mode */
+.dark .bg-gray-100 {
+  background-color: #111827 !important; /* slate-900-ish */
+}
+.dark .bg-gray-100 td {
+  color: #e5e7eb; /* light text for contrast */
+}
+
+.dark .raid-table td {
+  color: #e5e7eb;
+}
+
 .input-clear-btn {
   position: absolute;
   right: 8px;

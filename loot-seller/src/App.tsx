@@ -952,7 +952,7 @@ function App() {
             </div>
             <div style={{ width: '100%' }}>
               <div className="inventory-section">
-                <table className="item-table">
+                <table className="item-table raid-table">
                   <thead>
                     <tr>
                       <th>Raid Name</th>
