@@ -4573,7 +4573,7 @@ export const raidData: Raid[] = [
     "bossMessage": "",
     "location": "Khepresh(Map Room)",
     "mobs": [
-      "Warlock, Pharaoh, Slime Ooze"
+      "Warlock", "Pharaoh", "Slime Ooze"
     ],
     "bosses": [],
     "floors": [
